@@ -3,9 +3,10 @@
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Database, BarChart3, Brain, Users, Zap, Shield, Sun, Moon } from "lucide-react"
+import { ChevronDown, ChevronUp } from "lucide-react"
 import { useTheme } from "next-themes"
 import Image from "next/image"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useSession, signOut } from "next-auth/react"
 import { LoginModal, SignUpModal } from "@/components/AuthModals"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
@@ -20,6 +21,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Check } from "lucide-react";
+import { AnimatePresence } from "framer-motion"
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -70,6 +72,36 @@ const companyLogos = {
   // ...add more as needed...
 };
 
+// SplashScreen component - MODIFIED
+function SplashScreen() {
+  return (
+    <motion.div
+      initial={{ opacity: 1 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, transition: { duration: 0.7 } }}
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-background"
+      style={{ minHeight: '100vh', minWidth: '100vw' }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0, transition: { delay: 0.2, duration: 0.5 } }}
+        exit={{ opacity: 0, y: -40, transition: { duration: 0.7 } }}
+        className="flex items-center space-x-4"
+      >
+        <Image
+          src="/LOGO.jpg"
+          alt="DataSwift Logo"
+          width={80}
+          height={80}
+          className="object-cover w-20 h-20 rounded-lg"
+          priority
+        />
+        <span className="text-5xl font-extrabold text-primary">DataSwift</span>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 export default function LandingPagePreview() {
   const { data: session } = useSession()
   const user = session?.user
@@ -77,6 +109,21 @@ export default function LandingPagePreview() {
   const [mounted, setMounted] = useState(false)
   const [loginOpen, setLoginOpen] = useState(false)
   const [signupOpen, setSignUpOpen] = useState(false)
+
+  // Splash screen state
+  const [showSplash, setShowSplash] = useState(false);
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const seenSplash = sessionStorage.getItem('dataswift_splash_seen');
+      if (!seenSplash) {
+        setShowSplash(true);
+        setTimeout(() => {
+          setShowSplash(false);
+          sessionStorage.setItem('dataswift_splash_seen', 'true');
+        }, 1700);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     setMounted(true)
@@ -186,8 +233,90 @@ export default function LandingPagePreview() {
     // ...add more as needed...
   ];
 
+  const faqs = [
+    {
+      question: "What is DataSwift?",
+      answer: "DataSwift is a collaborative data analytics and machine learning platform designed to help teams analyze, model, and share insights quickly and securely.",
+    },
+    {
+      question: "Can I use DataSwift for free?",
+      answer: "Yes! Our Starter plan is free and lets you upload up to 10 datasets, use basic EDA tools, and access the Knowledge Hub.",
+    },
+    {
+      question: "Is my data secure on DataSwift?",
+      answer: "Absolutely. We use bank-grade security, granular access controls, and are compliant with major standards like GDPR and SOC2.",
+    },
+    {
+      question: "Can I collaborate with my team?",
+      answer: "Yes, DataSwift is built for real-time collaboration, version control, and seamless knowledge sharing across teams.",
+    },
+    {
+      question: "How do I get support?",
+      answer: "You can reach out via our Help Center, community forums, or contact our support team directly for assistance.",
+    },
+    {
+      question: "What types of data can I upload?",
+      answer: "DataSwift supports CSV, Excel, JSON, and many other common data formats. You can also connect to databases and cloud storage.",
+    },
+    {
+      question: "Does DataSwift offer AI-powered analytics?",
+      answer: "Yes, our platform includes automated EDA, smart visualizations, and AI-driven model recommendations to accelerate your workflow.",
+    },
+    {
+      question: "Can I integrate DataSwift with other tools?",
+      answer: "Absolutely! DataSwift offers APIs and supports integrations with popular tools like Slack, GitHub, and cloud providers.",
+    },
+    {
+      question: "Is there a limit to the number of users?",
+      answer: "No, all plans include unlimited users so your entire team can collaborate without restrictions.",
+    },
+    {
+      question: "How do I upgrade or change my plan?",
+      answer: "You can manage your subscription and upgrade your plan anytime from your account dashboard.",
+    },
+  ];
+  const faqsPerPage = 3;
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const autoScrollRef = useRef<NodeJS.Timeout | null>(null);
+  // Auto-scroll effect on hover (vertical floating)
+  useEffect(() => {
+    if (isHovered) {
+      autoScrollRef.current = setInterval(() => {
+        setCurrentIndex((prev) => {
+          // If we've completed a full loop, reset to 0, else increment
+          if ((prev + 1) % faqs.length === 0) {
+            return 0;
+          }
+          return prev + 1;
+        });
+      }, 2000);
+    } else if (autoScrollRef.current) {
+      clearInterval(autoScrollRef.current);
+      autoScrollRef.current = null;
+    }
+    return () => {
+      if (autoScrollRef.current) {
+        clearInterval(autoScrollRef.current);
+        autoScrollRef.current = null;
+      }
+    };
+  }, [isHovered, faqs.length]);
+  // Compute the visible FAQs for the floating effect
+  const visibleFaqs = [];
+  for (let i = 0; i < faqsPerPage; i++) {
+    visibleFaqs.push(faqs[(currentIndex + i) % faqs.length]);
+  }
+
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <AnimatePresence>
+        {showSplash && <SplashScreen />}
+      </AnimatePresence>
+      <div
+        className="min-h-screen bg-background overflow-x-hidden w-full"
+        style={{ pointerEvents: showSplash ? 'none' : undefined, opacity: showSplash ? 0 : 1 }}
+      >
       {/* Navigation */}
       <motion.nav
         className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border"
@@ -201,7 +330,7 @@ export default function LandingPagePreview() {
               <div className="w-10 h-10 flex items-center justify-center overflow-hidden">
                 <Image
                   src="/LOGO.jpg"
-                  alt="Dataswift Logo"
+                  alt="DataSwift Logo"
                   width={60}
                   height={60}
                   className="object-cover w-12 h-12 rounded-lg"
@@ -217,6 +346,9 @@ export default function LandingPagePreview() {
               </a>
               <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">
                 Pricing
+              </a>
+              <a href="#faq" className="text-muted-foreground hover:text-foreground transition-colors">
+                FAQ
               </a>
               <a href="#docs" className="text-muted-foreground hover:text-foreground transition-colors">
                 Docs
@@ -262,7 +394,7 @@ export default function LandingPagePreview() {
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-blue-500/5 to-transparent" />
-        <div className="container mx-auto px-6 pt-32 pb-20">
+        <div className="container mx-auto px-4 sm:px-6 pt-32 pb-20 max-w-full">
           <motion.div
             className="text-center max-w-4xl mx-auto"
             variants={staggerContainer}
@@ -278,7 +410,7 @@ export default function LandingPagePreview() {
             </motion.h1>
 
             <motion.p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto" variants={fadeInUp}>
-              Dataswift empowers teams to analyze, model, and share insights faster than ever. Built for modern data
+              DataSwift empowers teams to analyze, model, and share insights faster than ever. Built for modern data
               teams who demand speed, collaboration, and intelligence.
             </motion.p>
 
@@ -319,8 +451,8 @@ export default function LandingPagePreview() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 bg-muted/20">
-        <div className="container mx-auto px-6">
+      <section id="features" className="py-20 bg-gradient-to-br from-purple-500/10 via-blue-500/5 to-transparent">
+        <div className="container mx-auto px-4 sm:px-6 max-w-full">
           <motion.div
             className="text-center mb-16"
             initial={{ opacity: 0 }}
@@ -331,13 +463,13 @@ export default function LandingPagePreview() {
               Everything you need to <span className="text-primary">succeed</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              From data ingestion to model deployment, Dataswift provides all the tools your team needs in one
+              From data ingestion to model deployment, DataSwift provides all the tools your team needs in one
               integrated platform.
             </p>
           </motion.div>
 
           <motion.div
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 w-full"
             variants={staggerContainer}
             initial="initial"
             whileInView="animate"
@@ -363,7 +495,7 @@ export default function LandingPagePreview() {
 
       {/* Social Proof Section */}
       <section className="py-20 bg-gradient-to-br from-purple-500/10 via-blue-500/5 to-transparent">
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-4 sm:px-6 overflow-x-hidden max-w-full">
           <motion.div
             className="text-center"
             initial={{ opacity: 0 }}
@@ -375,25 +507,24 @@ export default function LandingPagePreview() {
               Trusted by data teams worldwide
             </h2>
             <p className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto font-medium">
-              From next-gen startups to established enterprises, leading teams trust Dataswift to power their analytics and collaboration.
+              From next-gen startups to established enterprises, leading teams trust DataSwift to power their analytics and collaboration.
             </p>
             <motion.div
-              className="marquee mt-8"
+              className="marquee mt-8 w-full"
               variants={staggerContainer}
               initial="initial"
               whileInView="animate"
               viewport={{ once: true }}
             >
-              <div className="marquee-content">
+              <div className="marquee-content w-full flex items-center gap-4 sm:gap-8 max-w-full">
                 {companies.concat(companies).map((company, index) => (
                   <motion.span
                     key={company.name + index}
-                    className="inline-flex items-center gap-2 text-2xl font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer mx-8"
-                    style={{ minWidth: 180 }}
+                    className="inline-flex items-center gap-1 sm:gap-2 text-base sm:text-2xl font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer whitespace-nowrap px-2 sm:px-4 max-w-full"
                     variants={fadeInUp}
                   >
                     {company.logo}
-                    {company.name}
+                    <span className="whitespace-nowrap block">{company.name}</span>
                   </motion.span>
                 ))}
               </div>
@@ -410,7 +541,14 @@ export default function LandingPagePreview() {
           }
           .marquee-content {
             display: flex;
+            align-items: center;
+            gap: 2rem;
             animation: marquee 45s linear infinite;
+          }
+          @media (max-width: 640px) {
+            .marquee-content {
+              animation-duration: 22.5s;
+            }
           }
           @keyframes marquee {
             0% { transform: translateX(0); }
@@ -424,7 +562,7 @@ export default function LandingPagePreview() {
         id="pricing"
         className="w-full py-24 bg-gradient-to-br from-purple-500/10 via-blue-500/5 to-transparent"
       >
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-2 sm:px-4 max-w-full">
           <motion.div
             className="text-center mb-12"
             initial={{ opacity: 0, y: 20 }}
@@ -467,7 +605,7 @@ export default function LandingPagePreview() {
               </div>
             </motion.div>
             {/* Pricing Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto h-full flex">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto h-full flex w-full">
               {plans.map((plan, idx) => (
                 <motion.div key={plan.name} variants={fadeInUp} className="h-full">
                   <Card
@@ -541,9 +679,50 @@ export default function LandingPagePreview() {
         </div>
       </section>
 
+      {/* FAQ Section */}
+      <section id="faq" className="py-20 bg-gradient-to-br from-purple-500/10 via-blue-500/5 to-transparent">
+        <div className="container mx-auto px-2 sm:px-6 max-w-full">
+          <motion.div
+            className="text-center mb-16"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Frequently Asked <span className="text-primary">Questions</span>
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Find answers to the most common questions about DataSwift.
+            </p>
+          </motion.div>
+          <div
+            className="relative max-w-3xl mx-auto w-full overflow-hidden h-[calc(3*7rem+2*1.5rem)] sm:h-[calc(3*8rem+2*2rem)]"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            <motion.div
+              className="pr-1 sm:pr-2 w-full"
+              animate={{ y: isHovered ? -1 * currentIndex * 112 : 0 }}
+              transition={{ type: 'tween', duration: 0.6 }}
+              style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
+            >
+              {faqs.concat(faqs.slice(0, faqsPerPage)).map((faq, idx) => (
+                <div
+                  key={faq.question + idx}
+                  className="bg-card border border-border rounded-lg p-6 text-left shadow-md min-h-[7rem] sm:min-h-[8rem]"
+                >
+                  <h3 className="text-xl font-semibold mb-2">{faq.question}</h3>
+                  <p className="text-muted-foreground">{faq.answer}</p>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* About Section */}
       <section id="about" className="py-20 bg-gradient-to-br from-purple-500/10 via-blue-500/5 to-transparent">
-        <div className="container mx-auto px-6 text-center max-w-3xl">
+        <div className="container mx-auto px-4 sm:px-6 text-center max-w-3xl w-full">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -551,10 +730,10 @@ export default function LandingPagePreview() {
             viewport={{ once: true }}
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Our Story & Values
+              Our Story
             </h2>
             <p className="text-lg md:text-xl text-muted-foreground mb-8 font-medium">
-              Dataswift was founded to empower every team to unlock the full potential of their data. Our mission is to make advanced analytics and machine learning accessible, collaborative, and lightning-fast for everyone.
+              DataSwift was founded to empower every team to unlock the full potential of their data. Our mission is to make advanced analytics and machine learning accessible, collaborative, and lightning-fast for everyone.
             </p>
             <motion.div
               className="flex flex-col md:flex-row gap-8 justify-center items-center"
@@ -577,8 +756,8 @@ export default function LandingPagePreview() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-purple-500/10 to-blue-500/10">
-        <div className="container mx-auto px-6 text-center">
+      <section className="py-20 bg-gradient-to-br from-purple-500/10 via-blue-500/5 to-transparent">
+        <div className="container mx-auto px-4 sm:px-6 text-center max-w-full">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
               Ready to transform your{" "}
@@ -587,15 +766,12 @@ export default function LandingPagePreview() {
               </span>
             </h2>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join thousands of data teams who trust Dataswift to power their analytics and collaboration.
+              Join thousands of data teams who trust DataSwift to power their analytics and collaboration.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
               <Button size="lg" className="px-8 py-4 text-lg">
                 Get Started Free
                 <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-              <Button variant="outline" size="lg" className="px-8 py-4 text-lg bg-transparent">
-                Schedule Demo
               </Button>
             </div>
           </motion.div>
@@ -705,10 +881,11 @@ export default function LandingPagePreview() {
           </div>
 
           <div className="border-t border-border mt-8 pt-8 text-center text-muted-foreground">
-            <p>&copy; 2024 Dataswift. All rights reserved.</p>
+          <p className="text-sm">&copy; {new Date().getFullYear()} DataSwift. All rights reserved.</p>
           </div>
         </div>
       </footer>
-    </div>
-  )
+      </div>
+    </>
+  );
 }

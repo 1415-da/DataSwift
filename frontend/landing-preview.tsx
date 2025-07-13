@@ -233,7 +233,7 @@ export default function LandingPagePreview() {
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <Database className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold">Dataswift</span>
+              <span className="text-xl font-bold">DataSwift</span>
             </div>
 
             <div className="hidden md:flex items-center space-x-8">
@@ -281,7 +281,7 @@ export default function LandingPagePreview() {
             </motion.h1>
 
             <motion.p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto" variants={fadeInUp}>
-              Dataswift empowers teams to analyze, model, and share insights faster than ever. Built for modern data
+              DataSwift empowers teams to analyze, model, and share insights faster than ever. Built for modern data
               teams who demand speed, collaboration, and intelligence.
             </motion.p>
 
@@ -334,7 +334,7 @@ export default function LandingPagePreview() {
               Everything you need to <span className="text-primary">succeed</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              From data ingestion to model deployment, Dataswift provides all the tools your team needs in one
+              From data ingestion to model deployment, DataSwift provides all the tools your team needs in one
               integrated platform.
             </p>
           </motion.div>
@@ -440,7 +440,7 @@ export default function LandingPagePreview() {
               </span>
             </h2>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join thousands of data teams who trust Dataswift to power their analytics and collaboration.
+              Join thousands of data teams who trust DataSwift to power their analytics and collaboration.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button size="lg" className="px-8 py-4 text-lg">
@@ -464,7 +464,7 @@ export default function LandingPagePreview() {
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                   <Database className="w-5 h-5 text-primary-foreground" />
                 </div>
-                <span className="text-xl font-bold">Dataswift</span>
+                <span className="text-xl font-bold">DataSwift</span>
               </div>
               <p className="text-muted-foreground">
                 The modern platform for collaborative data analytics and machine learning.
@@ -551,7 +551,7 @@ export default function LandingPagePreview() {
           </div>
 
           <div className="border-t border-border mt-8 pt-8 text-center text-muted-foreground">
-            <p>&copy; 2024 Dataswift. All rights reserved.</p>
+            <p>&copy; 2024 DataSwift. All rights reserved.</p>
           </div>
         </div>
       </footer>
