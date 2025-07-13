@@ -1,0 +1,36 @@
+{
+  "name": "dataswift",
+  "version": "1.0.0",
+  "description": "A full-stack data science platform with Next.js frontend and Python FastAPI backend",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter my-v0-project dev",
+    "build": "pnpm --filter my-v0-project build",
+    "start": "pnpm --filter my-v0-project start",
+    "lint": "pnpm --filter my-v0-project lint",
+    "dev:backend": "cd backend && python -m uvicorn src.app:app --reload --host 0.0.0.0 --port 8000",
+    "install:backend": "cd backend && pip install -r requirements.txt",
+    "test": "pnpm --filter my-v0-project test",
+    "clean": "rm -rf node_modules */node_modules dist build .next out",
+    "setup": "pnpm install && pnpm install:backend"
+  },
+  "keywords": [
+    "data-science",
+    "machine-learning",
+    "nextjs",
+    "fastapi",
+    "python",
+    "typescript",
+    "react"
+  ],
+  "author": "DataSwift Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "typescript": "^5"
+  }
+}

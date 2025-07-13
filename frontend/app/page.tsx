@@ -6,6 +6,10 @@ import { ArrowRight, Database, BarChart3, Brain, Users, Zap, Shield, Sun, Moon }
 import { useTheme } from "next-themes"
 import Image from "next/image"
 import { useEffect, useState } from "react"
+import { useSession, signOut } from "next-auth/react"
+import { LoginModal, SignUpModal } from "@/components/AuthModals"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -22,8 +26,12 @@ const staggerContainer = {
 }
 
 export default function LandingPagePreview() {
+  const { data: session } = useSession()
+  const user = session?.user
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const [loginOpen, setLoginOpen] = useState(false)
+  const [signupOpen, setSignUpOpen] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -103,15 +111,37 @@ export default function LandingPagePreview() {
             </div>
 
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
-                {mounted && theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-              </Button>
-              <Button variant="ghost">Login</Button>
-              <Button>Sign in</Button>
+              <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>{mounted && theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}</Button>
+              {!user ? (
+                <>
+                  <Button variant="ghost" onClick={() => setLoginOpen(true)}>Login</Button>
+                  <Button onClick={() => setSignUpOpen(true)}>Sign up</Button>
+                </>
+              ) : (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <div className="flex items-center space-x-2 cursor-pointer">
+                      <Avatar>
+                        {user.image ? (
+                          <AvatarImage src={user.image} alt={user.name || user.email || "User"} />
+                        ) : (
+                          <AvatarFallback>{user.name ? user.name.split(" ").map(n => n[0]).join("") : user.email?.split("@")[0].slice(0,2).toUpperCase()}</AvatarFallback>
+                        )}
+                      </Avatar>
+                    </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem>Profile</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>Logout</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </div>
         </div>
       </motion.nav>
+      <LoginModal open={loginOpen} onOpenChange={setLoginOpen} />
+      <SignUpModal open={signupOpen} onOpenChange={setSignUpOpen} />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden">
