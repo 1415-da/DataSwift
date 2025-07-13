@@ -10,6 +10,16 @@ import { useSession, signOut } from "next-auth/react"
 import { LoginModal, SignUpModal } from "@/components/AuthModals"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Check } from "lucide-react";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -24,6 +34,41 @@ const staggerContainer = {
     },
   },
 }
+
+// Add SVG logo components at the top of the file (or in the same file for demo):
+const companyLogos = {
+  TechCorp: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#6366F1"/><text x="16" y="21" textAnchor="middle" fontSize="16" fill="#fff" fontWeight="bold">T</text></svg>
+  ),
+  DataFlow: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="16" fill="#0EA5E9"/><circle cx="16" cy="16" r="7" fill="#fff"/><circle cx="16" cy="16" r="3" fill="#0EA5E9"/></svg>
+  ),
+  AILabs: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="16" fill="#F59E42"/><rect x="10" y="10" width="12" height="12" rx="6" fill="#fff"/><circle cx="16" cy="16" r="3" fill="#F59E42"/></svg>
+  ),
+  AnalyticsPro: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="16" fill="#10B981"/><rect x="8" y="20" width="3" height="4" rx="1.5" fill="#fff"/><rect x="14" y="14" width="3" height="10" rx="1.5" fill="#fff"/><rect x="20" y="8" width="3" height="16" rx="1.5" fill="#fff"/></svg>
+  ),
+  MLStudio: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="16" fill="#F472B6"/><path d="M10 22L16 10L22 22" stroke="#fff" strokeWidth="2" strokeLinecap="round"/></svg>
+  ),
+  InsightCo: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#FBBF24"/><circle cx="16" cy="16" r="7" fill="#fff"/><circle cx="16" cy="16" r="3" fill="#FBBF24"/></svg>
+  ),
+  DataNest: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="16" fill="#A3E635"/><path d="M8 20C12 24 20 24 24 20" stroke="#fff" strokeWidth="2" strokeLinecap="round"/><ellipse cx="16" cy="16" rx="6" ry="3" fill="#fff"/></svg>
+  ),
+  CloudSync: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="16" fill="#38BDF8"/><ellipse cx="16" cy="20" rx="8" ry="4" fill="#fff"/><ellipse cx="16" cy="16" rx="5" ry="2" fill="#38BDF8"/></svg>
+  ),
+  QuantumAnalytics: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#8B5CF6"/><circle cx="16" cy="16" r="7" fill="#fff"/><circle cx="16" cy="16" r="3" fill="#8B5CF6"/></svg>
+  ),
+  FinSight: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="16" fill="#F43F5E"/><rect x="10" y="14" width="12" height="4" rx="2" fill="#fff"/><rect x="14" y="10" width="4" height="12" rx="2" fill="#fff"/></svg>
+  ),
+  // ...add more as needed...
+};
 
 export default function LandingPagePreview() {
   const { data: session } = useSession()
@@ -69,6 +114,77 @@ export default function LandingPagePreview() {
       description: "Bank-grade security, compliance ready, with granular access controls and audit trails.",
     },
   ]
+
+  // Pricing section logic
+  const plans = [
+    {
+      name: "Starter",
+      price: "$0",
+      period: "/mo",
+      features: [
+        "Upload up to 10 datasets",
+        "Basic EDA tools and visualizations",
+        "Access to Knowledge Hub articles",
+        "Community support",
+      ],
+      cta: "Get Started",
+      highlight: false,
+      priceId: "starter",
+    },
+    {
+      name: "Pro",
+      price: "$29",
+      period: "/mo",
+      features: [
+        "Unlimited datasets and storage",
+        "Advanced EDA and ModelLab features",
+        "AI-powered model recommendations",
+        "Real-time collaboration and commenting",
+        "Priority email support",
+        "Access to interactive tutorials and feedback analytics",
+      ],
+      cta: "Start Free Trial",
+      highlight: true,
+      priceId: "pro",
+    },
+    {
+      name: "Enterprise",
+      price: "$99",
+      period: "/mo",
+      features: [
+        "All Pro features",
+        "Dedicated account manager",
+        "Custom integrations and SSO",
+        "Enhanced security and compliance (GDPR, SOC2)",
+        "SLA and premium support",
+        "Tailored onboarding and training",
+      ],
+      cta: "Contact Sales",
+      highlight: false,
+      priceId: "enterprise",
+    },
+  ];
+  const annualPrices = {
+    starter: "$0",
+    pro: "$210",
+    enterprise: "$900",
+  };
+  const [billing, setBilling] = useState<'monthly' | 'annual'>("monthly");
+
+  // In the companies array, use the logo key and render the SVG in the marquee:
+  const companies = [
+    { name: "TechCorp", logo: companyLogos.TechCorp },
+    { name: "DataFlow", logo: companyLogos.DataFlow },
+    { name: "AI Labs", logo: companyLogos.AILabs },
+    { name: "Analytics Pro", logo: companyLogos.AnalyticsPro },
+    { name: "ML Studio", logo: companyLogos.MLStudio },
+    { name: "Insight Co", logo: companyLogos.InsightCo },
+    { name: "DataNest", logo: companyLogos.DataNest },
+    { name: "CloudSync", logo: companyLogos.CloudSync },
+    { name: "Quantum Analytics", logo: companyLogos.QuantumAnalytics },
+    { name: "FinSight", logo: companyLogos.FinSight },
+    // ...add more as needed...
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -246,7 +362,7 @@ export default function LandingPagePreview() {
       </section>
 
       {/* Social Proof Section */}
-      <section className="py-20">
+      <section className="py-20 bg-gradient-to-br from-purple-500/10 via-blue-500/5 to-transparent">
         <div className="container mx-auto px-6">
           <motion.div
             className="text-center"
@@ -255,34 +371,206 @@ export default function LandingPagePreview() {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-2xl font-semibold mb-4">Trusted by data teams worldwide</h2>
-            <p className="text-muted-foreground mb-12">From next-gen startups to established enterprises.</p>
-
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Trusted by data teams worldwide
+            </h2>
+            <p className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto font-medium">
+              From next-gen startups to established enterprises, leading teams trust Dataswift to power their analytics and collaboration.
+            </p>
             <motion.div
-              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center justify-items-center"
+              className="marquee mt-8"
               variants={staggerContainer}
               initial="initial"
               whileInView="animate"
               viewport={{ once: true }}
             >
-              {[
-                { name: "TechCorp", logo: "🚀" },
-                { name: "DataFlow", logo: "📊" },
-                { name: "AI Labs", logo: "🤖" },
-                { name: "Analytics Pro", logo: "📈" },
-                { name: "ML Studio", logo: "🧠" },
-                { name: "Insight Co", logo: "💡" },
-              ].map((company, index) => (
+              <div className="marquee-content">
+                {companies.concat(companies).map((company, index) => (
+                  <motion.span
+                    key={company.name + index}
+                    className="inline-flex items-center gap-2 text-2xl font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer mx-8"
+                    style={{ minWidth: 180 }}
+                    variants={fadeInUp}
+                  >
+                    {company.logo}
+                    {company.name}
+                  </motion.span>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+        <style jsx>{`
+          .marquee {
+            display: flex;
+            overflow: hidden;
+            white-space: nowrap;
+            width: 100%;
+            position: relative;
+          }
+          .marquee-content {
+            display: flex;
+            animation: marquee 45s linear infinite;
+          }
+          @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+          }
+        `}</style>
+      </section>
+
+      {/* Pricing Section */}
+      <section
+        id="pricing"
+        className="w-full py-24 bg-gradient-to-br from-purple-500/10 via-blue-500/5 to-transparent"
+      >
+        <div className="container mx-auto px-4">
+          <motion.div
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Simple, transparent pricing
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Choose the plan that fits your team. No hidden fees, no surprises.
+            </p>
+          </motion.div>
                 <motion.div
-                  key={company.name}
-                  className="text-2xl font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                  variants={fadeInUp}
-                  whileHover={{ scale: 1.1 }}
+            initial="initial"
+            whileInView="animate"
+            variants={staggerContainer}
+            viewport={{ once: true }}
+          >
+            {/* Billing Toggle */}
+            <motion.div variants={fadeInUp} className="flex justify-center mb-10">
+              <div className="inline-flex items-center bg-muted rounded-full p-1 shadow-sm">
+                <Button
+                  variant={billing === "monthly" ? "default" : "ghost"}
+                  size="sm"
+                  className="rounded-full px-6"
+                  onClick={() => setBilling("monthly")}
                 >
-                  <span className="mr-2">{company.logo}</span>
-                  {company.name}
+                  Monthly
+                </Button>
+                <Button
+                  variant={billing === "annual" ? "default" : "ghost"}
+                  size="sm"
+                  className="rounded-full px-6"
+                  onClick={() => setBilling("annual")}
+                >
+                  Annual <span className="ml-2 text-xs text-white bg-green-500 rounded px-2 py-0.5">Save 2 months</span>
+                </Button>
+              </div>
+            </motion.div>
+            {/* Pricing Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto h-full flex">
+              {plans.map((plan, idx) => (
+                <motion.div key={plan.name} variants={fadeInUp} className="h-full">
+                  <Card
+                    className={`h-full flex flex-col justify-between shadow-lg transition-transform hover:-translate-y-1 hover:shadow-2xl border-2 ${
+                      plan.highlight
+                        ? "border-primary/80 shadow-primary/20 relative z-10 scale-105 bg-gradient-to-br from-primary/5 to-background"
+                        : plan.name === "Enterprise"
+                        ? "border-muted bg-card/80"
+                        : "border-border bg-card"
+                    }`}
+                  >
+                    <CardHeader className="pb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <CardTitle className="text-2xl font-bold flex items-center gap-2">
+                          {plan.name}
+                          {plan.highlight && (
+                            <Badge className="ml-2" variant="secondary">
+                              Most Popular
+                            </Badge>
+                          )}
+                        </CardTitle>
+                      </div>
+                      <div className="flex items-end gap-2">
+                        <span className="text-4xl md:text-5xl font-extrabold">
+                          {billing === "annual"
+                            ? annualPrices[plan.priceId as keyof typeof annualPrices]
+                            : plan.price}
+                        </span>
+                        <span className="text-lg text-muted-foreground font-medium">
+                          {billing === "monthly" ? plan.period : ""}
+                          {billing === "annual" && plan.priceId === "pro" && (
+                            <span className="ml-1 text-xs">(billed yearly)</span>
+                          )}
+                        </span>
+                      </div>
+                      <CardDescription className="mt-2">
+                        {plan.name === "Starter" && "Perfect for individuals and hobbyists."}
+                        {plan.name === "Pro" && "For growing teams who need more power and collaboration."}
+                        {plan.name === "Enterprise" && "Custom solutions for large organizations."}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex-1 pb-0">
+                      <ul className="space-y-3 mt-4">
+                        {plan.features.map((feature) => (
+                          <li key={feature} className="flex items-center gap-2 text-base">
+                            <Check className="text-primary w-5 h-5 shrink-0" />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                    <CardFooter className="pt-6 flex flex-col">
+                      <Button
+                        size="lg"
+                        className={`w-full font-semibold ${plan.highlight ? "bg-primary text-primary-foreground hover:bg-primary/90" : ""}`}
+                      >
+                        {plan.cta}
+                      </Button>
+                    </CardFooter>
+                  </Card>
                 </motion.div>
               ))}
+            </div>
+            {/* FAQ / Note */}
+            <motion.div variants={fadeInUp} className="mt-12 text-center text-muted-foreground text-sm max-w-xl mx-auto">
+              <p>
+                All plans include unlimited users. Annual billing saves you 2 months. Need a custom solution? <a href="#" className="text-primary underline">Contact us</a>.
+              </p>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section id="about" className="py-20 bg-gradient-to-br from-purple-500/10 via-blue-500/5 to-transparent">
+        <div className="container mx-auto px-6 text-center max-w-3xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Our Story & Values
+            </h2>
+            <p className="text-lg md:text-xl text-muted-foreground mb-8 font-medium">
+              Dataswift was founded to empower every team to unlock the full potential of their data. Our mission is to make advanced analytics and machine learning accessible, collaborative, and lightning-fast for everyone.
+            </p>
+            <motion.div
+              className="flex flex-col md:flex-row gap-8 justify-center items-center"
+              variants={staggerContainer}
+              initial="initial"
+              whileInView="animate"
+              viewport={{ once: true }}
+            >
+              <motion.div className="mb-6 md:mb-0" variants={fadeInUp}>
+                <h3 className="font-bold text-xl mb-2">Our Mission</h3>
+                <p className="text-muted-foreground">To democratize data science and make collaboration seamless for all teams.</p>
+              </motion.div>
+              <motion.div variants={fadeInUp}>
+                <h3 className="font-bold text-xl mb-2">Our Values</h3>
+                <p className="text-muted-foreground">Innovation, transparency, and customer obsession drive everything we do.</p>
+              </motion.div>
             </motion.div>
           </motion.div>
         </div>
