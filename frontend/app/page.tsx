@@ -22,6 +22,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Check } from "lucide-react";
 import { AnimatePresence } from "framer-motion"
+import { useRouter } from 'next/navigation';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -109,6 +110,7 @@ export default function LandingPagePreview() {
   const [mounted, setMounted] = useState(false)
   const [loginOpen, setLoginOpen] = useState(false)
   const [signupOpen, setSignUpOpen] = useState(false)
+  const router = useRouter();
 
   // Splash screen state
   const [showSplash, setShowSplash] = useState(false);
@@ -415,7 +417,17 @@ export default function LandingPagePreview() {
             </motion.p>
 
             <motion.div className="flex flex-col sm:flex-row gap-4 justify-center items-center" variants={fadeInUp}>
-              <Button size="lg" className="px-8 py-4 text-lg">
+              <Button
+                size="lg"
+                className="px-8 py-4 text-lg"
+                onClick={() => {
+                  if (user) {
+                    router.push('/dashboard');
+                  } else {
+                    setLoginOpen(true);
+                  }
+                }}
+              >
                 Start Building
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
@@ -769,7 +781,17 @@ export default function LandingPagePreview() {
               Join thousands of data teams who trust DataSwift to power their analytics and collaboration.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
-              <Button size="lg" className="px-8 py-4 text-lg">
+              <Button
+                size="lg"
+                className="px-8 py-4 text-lg"
+                onClick={() => {
+                  if (user) {
+                    router.push('/dashboard');
+                  } else {
+                    setLoginOpen(true);
+                  }
+                }}
+              >
                 Get Started Free
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>

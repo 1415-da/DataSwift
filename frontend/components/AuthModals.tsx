@@ -18,6 +18,7 @@ export function LoginModal({ open, onOpenChange }: { open: boolean, onOpenChange
   const [error, setError] = useState("")
   const [resetOpen, setResetOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [signUpOpen, setSignUpOpen] = useState(false)
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -82,9 +83,20 @@ export function LoginModal({ open, onOpenChange }: { open: boolean, onOpenChange
               <Button type="submit" disabled={loading} className="w-full">{loading ? "Logging in..." : "Login"}</Button>
             </DialogFooter>
           </form>
+          <div className="mt-4 text-center text-sm">
+            New here?{' '}
+            <button
+              type="button"
+              className="text-primary hover:underline font-medium"
+              onClick={() => { onOpenChange(false); setSignUpOpen(true); }}
+            >
+              Create an account
+            </button>
+          </div>
         </DialogContent>
       </Dialog>
       <ResetPasswordModal open={resetOpen} onOpenChange={setResetOpen} />
+      <SignUpModal open={signUpOpen} onOpenChange={setSignUpOpen} />
     </>
   )
 }

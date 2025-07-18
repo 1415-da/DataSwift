@@ -3,6 +3,7 @@
 import type * as React from "react"
 import { ChevronDown, Database, TestTube, GraduationCap, BookOpen, Sun, Moon, Laptop } from "lucide-react"
 import { useTheme } from "next-themes"
+import Image from 'next/image';
 
 import {
   Sidebar,
@@ -78,10 +79,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar {...props}>
       <SidebarHeader>
         <div className="flex items-center space-x-2 px-2 py-2">
-          <div className="w-6 h-6 bg-foreground rounded-sm flex items-center justify-center">
-            <div className="w-3 h-3 bg-background rounded-sm transform rotate-45"></div>
+          <div className="w-8 h-8 flex items-center justify-center overflow-hidden rounded-lg bg-background border border-border">
+            <Image src="/LOGO.jpg" alt="DataSwift Logo" width={32} height={32} className="object-cover w-8 h-8" />
           </div>
-          <span className="text-xl font-semibold">Linear</span>
+          <span className="text-xl font-semibold">DataSwift</span>
         </div>
       </SidebarHeader>
 
