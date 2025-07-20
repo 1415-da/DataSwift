@@ -4,6 +4,7 @@ import type * as React from "react"
 import { ChevronDown, Database, TestTube, GraduationCap, BookOpen, Sun, Moon, Laptop } from "lucide-react"
 import { useTheme } from "next-themes"
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 
 import {
   Sidebar,
@@ -30,7 +31,7 @@ const navigationData = [
     title: "EDA",
     icon: Database,
     items: [
-      { title: "Data Overview", url: "#" },
+      { title: "Data Overview", url: "/dashboard/eda" },
       { title: "Statistical Analysis", url: "#" },
       { title: "Data Visualization", url: "#" },
       { title: "Feature Engineering", url: "#" },
@@ -41,7 +42,7 @@ const navigationData = [
     title: "Model Testing",
     icon: TestTube,
     items: [
-      { title: "Model Validation", url: "#" },
+      { title: "Model Validation", url: "/dashboard/model-testing" },
       { title: "Cross Validation", url: "#" },
       { title: "Performance Metrics", url: "#" },
       { title: "A/B Testing", url: "#" },
@@ -52,7 +53,7 @@ const navigationData = [
     title: "Training",
     icon: GraduationCap,
     items: [
-      { title: "Model Training", url: "#" },
+      { title: "Model Training", url: "/dashboard/training" },
       { title: "Hyperparameter Tuning", url: "#" },
       { title: "Pipeline Management", url: "#" },
       { title: "Experiment Tracking", url: "#" },
@@ -63,17 +64,18 @@ const navigationData = [
     title: "Knowledge Hub",
     icon: BookOpen,
     items: [
-      { title: "Documentation", url: "#" },
-      { title: "Best Practices", url: "#" },
-      { title: "Tutorials", url: "#" },
-      { title: "API Reference", url: "#" },
-      { title: "Community", url: "#" },
+      { title: "Documentation", url: "/dashboard/knowledgehub/documentation" },
+      { title: "Best Practices", url: "/dashboard/knowledgehub/best-practices" },
+      { title: "Tutorials", url: "/dashboard/knowledgehub/tutorials" },
+      { title: "API Reference", url: "/dashboard/knowledgehub/api" },
+      { title: "Community", url: "/dashboard/knowledgehub/community" },
     ],
   },
 ]
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { setTheme, theme } = useTheme()
+  const { setTheme, theme } = useTheme();
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
 
   return (
     <Sidebar {...props}>
@@ -88,31 +90,31 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel>
+            <span className="text-base font-bold tracking-wide uppercase text-sidebar-foreground/80">Navigation</span>
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {navigationData.map((item) => (
-                <Collapsible key={item.title} defaultOpen className="group/collapsible">
+                <Collapsible key={item.title} defaultOpen className="group/collapsible mt-2">
                   <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
-                      <SidebarMenuButton className="w-full">
-                        <item.icon className="h-4 w-4" />
+                      <SidebarMenuButton className="w-full text-[1rem] font-semibold tracking-tight flex items-center gap-2">
+                        {item.icon ? <item.icon className="h-4 w-4" /> : null}
                         <span>{item.title}</span>
                         <ChevronDown className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
                       </SidebarMenuButton>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <SidebarMenuSub>
-                        {item.items.map((subItem) => (
+                        {Array.isArray(item.items) && item.items.map((subItem) => (
                           <SidebarMenuSubItem key={subItem.title}>
-                            <SidebarMenuSubButton asChild>
-                              <a
-                                href={subItem.url}
-                                className="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                              >
-                                {subItem.title}
-                              </a>
-                            </SidebarMenuSubButton>
+                            <a
+                              href={subItem.url}
+                              className="pl-7 py-1 block text-[0.97rem] font-normal text-sidebar-foreground/90 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded transition-colors"
+                            >
+                              {subItem.title}
+                            </a>
                           </SidebarMenuSubItem>
                         ))}
                       </SidebarMenuSub>

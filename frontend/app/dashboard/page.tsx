@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
 
 export default function DashboardPage() {
   return (
@@ -69,10 +70,28 @@ export default function DashboardPage() {
           <CardDescription>AI-powered search, articles, and tutorials.</CardDescription>
         </CardHeader>
         <CardContent>
-          
+          <div className="flex flex-wrap gap-2">
+            <Link href="/dashboard/knowledgehub/documentation" passHref legacyBehavior>
+              <Button variant="secondary" size="sm">Documentation</Button>
+            </Link>
+            <Link href="/dashboard/knowledgehub/best-practices" passHref legacyBehavior>
+              <Button variant="secondary" size="sm">Best Practices</Button>
+            </Link>
+            <Link href="/dashboard/knowledgehub/tutorials" passHref legacyBehavior>
+              <Button variant="secondary" size="sm">Tutorials</Button>
+            </Link>
+            <Link href="/dashboard/knowledgehub/api" passHref legacyBehavior>
+              <Button variant="secondary" size="sm">API Reference</Button>
+            </Link>
+            <Link href="/dashboard/knowledgehub/community" passHref legacyBehavior>
+              <Button variant="secondary" size="sm">Community</Button>
+            </Link>
+          </div>
         </CardContent>
         <CardFooter className="justify-end">
-          <Button variant="outline" size="sm">Browse All</Button>
+          <Link href="/dashboard/knowledgehub/documentation" passHref legacyBehavior>
+            <Button variant="outline" size="sm">Browse All</Button>
+          </Link>
         </CardFooter>
       </Card>
 
