@@ -352,9 +352,19 @@ export default function LandingPagePreview() {
               <a href="#faq" className="text-muted-foreground hover:text-foreground transition-colors">
                 FAQ
               </a>
-              <a href="#docs" className="text-muted-foreground hover:text-foreground transition-colors">
+              <button
+                className="text-muted-foreground hover:text-foreground transition-colors bg-transparent border-none outline-none cursor-pointer"
+                style={{ background: 'none', padding: 0 }}
+                onClick={() => {
+                  if (user) {
+                    router.push('/dashboard/knowledgehub/documentation');
+                  } else {
+                    setLoginOpen(true);
+                  }
+                }}
+              >
                 Docs
-              </a>
+              </button>
               <a href="#about" className="text-muted-foreground hover:text-foreground transition-colors">
                 About
               </a>

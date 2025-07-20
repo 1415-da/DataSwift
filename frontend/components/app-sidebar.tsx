@@ -5,6 +5,7 @@ import { ChevronDown, Database, TestTube, GraduationCap, BookOpen, Sun, Moon, La
 import { useTheme } from "next-themes"
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 
 import {
   Sidebar,
@@ -109,12 +110,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       <SidebarMenuSub>
                         {Array.isArray(item.items) && item.items.map((subItem) => (
                           <SidebarMenuSubItem key={subItem.title}>
-                            <a
-                              href={subItem.url}
-                              className="pl-7 py-1 block text-[0.97rem] font-normal text-sidebar-foreground/90 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded transition-colors"
-                            >
-                              {subItem.title}
-                            </a>
+                            <SidebarMenuSubButton asChild>
+                              <Link href={subItem.url} prefetch={true} className="pl-7 py-1 block text-[0.97rem] font-normal text-sidebar-foreground/90 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded transition-colors">
+                                {subItem.title}
+                              </Link>
+                            </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                         ))}
                       </SidebarMenuSub>
