@@ -23,6 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { Check } from "lucide-react";
 import { AnimatePresence } from "framer-motion"
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -104,8 +105,7 @@ function SplashScreen() {
 }
 
 export default function LandingPagePreview() {
-  const { data: session } = useSession()
-  const user = session?.user
+  const { user } = useAuth();
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [loginOpen, setLoginOpen] = useState(false)
@@ -362,29 +362,26 @@ export default function LandingPagePreview() {
 
             <div className="flex items-center space-x-4">
               <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>{mounted && theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}</Button>
-              {!user ? (
+              {!user && (
                 <>
                   <Button variant="ghost" onClick={() => setLoginOpen(true)}>Login</Button>
                   <Button onClick={() => setSignUpOpen(true)}>Sign up</Button>
                 </>
-              ) : (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <div className="flex items-center space-x-2 cursor-pointer">
-                      <Avatar>
-                        {user.image ? (
-                          <AvatarImage src={user.image} alt={user.name || user.email || "User"} />
-                        ) : (
-                          <AvatarFallback>{user.name ? user.name.split(" ").map(n => n[0]).join("") : user.email?.split("@")[0].slice(0,2).toUpperCase()}</AvatarFallback>
-                        )}
-                      </Avatar>
-                    </div>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>Profile</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>Logout</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+              )}
+              {user && (
+                <>
+                  <div className="flex items-center gap-2 px-2 py-1 rounded-md bg-muted">
+                    <Avatar className="w-8 h-8">
+                      {user.avatarUrl ? (
+                        <AvatarImage src={user.avatarUrl} alt={user.name || user.email} />
+                      ) : (
+                        <AvatarFallback>{user.name ? user.name[0].toUpperCase() : user.email[0].toUpperCase()}</AvatarFallback>
+                      )}
+                    </Avatar>
+                    <span className="hidden md:inline text-sm font-medium text-foreground/80">{user.name || user.email}</span>
+                  </div>
+                  <Button size="sm" className="ml-2" onClick={() => router.push('/dashboard')}>Go to Dashboard</Button>
+                </>
               )}
             </div>
           </div>

@@ -21,9 +21,6 @@ export default function DashboardPage() {
             <Button variant="secondary">Connect API</Button>
             <Button variant="secondary">Link Database</Button>
           </div>
-          <div className="h-24 bg-muted rounded flex items-center justify-center text-muted-foreground text-sm">
-            <span>[Sample Data Chart]</span>
-          </div>
         </CardContent>
         <CardFooter className="justify-end">
           <Button variant="outline" size="sm">View Datasets</Button>
@@ -37,9 +34,6 @@ export default function DashboardPage() {
           <CardDescription>One-click profiling, stats, and visualizations.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-24 bg-muted rounded flex items-center justify-center text-muted-foreground text-sm mb-2">
-            <span>[EDA Chart Previews]</span>
-          </div>
           <div className="flex gap-2">
             <Button variant="secondary" size="sm">Run EDA</Button>
             <Button variant="outline" size="sm">Download Report</Button>
@@ -60,9 +54,6 @@ export default function DashboardPage() {
           <CardDescription>Train, compare, and test ML models with AI guidance.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-24 bg-muted rounded flex items-center justify-center text-muted-foreground text-sm mb-2">
-            <span>[Model Comparison Chart]</span>
-          </div>
           <div className="flex gap-2 mb-2">
             <Button variant="secondary" size="sm">New Model</Button>
             <Button variant="outline" size="sm">View All</Button>
@@ -78,13 +69,7 @@ export default function DashboardPage() {
           <CardDescription>AI-powered search, articles, and tutorials.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="mb-4">
-            <input type="text" placeholder="Search Knowledge Hub..." className="w-full rounded border px-3 py-2 text-sm" />
-          </div>
-          <div className="h-16 bg-muted rounded flex flex-col items-center justify-center text-muted-foreground text-sm gap-1">
-            <span>[Recent: "How to Clean Data"]</span>
-            <span>[Recommended: "Best EDA Practices"]</span>
-          </div>
+          
         </CardContent>
         <CardFooter className="justify-end">
           <Button variant="outline" size="sm">Browse All</Button>
@@ -98,10 +83,6 @@ export default function DashboardPage() {
           <CardDescription>Guides, FAQs, and feedback widget.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-16 bg-muted rounded flex flex-col items-center justify-center text-muted-foreground text-sm mb-2 gap-1">
-            <span>[Docs: "API Reference"]</span>
-            <span>[Feedback Widget]</span>
-          </div>
           <Button variant="secondary" size="sm">Give Feedback</Button>
         </CardContent>
       </Card>
@@ -113,10 +94,6 @@ export default function DashboardPage() {
           <CardDescription>Comments, team status, and activity log.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-16 bg-muted rounded flex flex-col items-center justify-center text-muted-foreground text-sm mb-2 gap-1">
-            <span>[Avatars: Alice, Bob, Carol]</span>
-            <span>[Recent Comment: "Great model!"]</span>
-          </div>
           <Button variant="secondary" size="sm">Open Comments</Button>
         </CardContent>
       </Card>
@@ -128,9 +105,6 @@ export default function DashboardPage() {
           <CardDescription>Customize your workspace and preferences.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-16 bg-muted rounded flex flex-col items-center justify-center text-muted-foreground text-sm mb-2 gap-1">
-            <span>[Profile, Notifications, Integrations]</span>
-          </div>
           <Button variant="outline" size="sm">Go to Settings</Button>
         </CardContent>
       </Card>

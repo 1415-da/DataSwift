@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,23 +16,27 @@ export function LoginModal({ open, onOpenChange }: { open: boolean, onOpenChange
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
   const [resetOpen, setResetOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [signUpOpen, setSignUpOpen] = useState(false)
+  const { login } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
+    setSuccess("")
     setLoading(true)
-    // If you want to support credentials login, you must add CredentialsProvider to NextAuth.js
-    const res = await signIn("credentials", {
-      redirect: false,
-      email,
-      password,
-    })
-    setLoading(false)
-    if (res?.error) setError(res.error)
-    else onOpenChange(false)
+    try {
+      await login(email, password);
+      setLoading(false);
+      setSuccess("Login successful!");
+      setTimeout(() => setSuccess(""), 2000);
+      setTimeout(() => onOpenChange(false), 1200);
+    } catch (err: any) {
+      setError(err.message || "Login failed");
+      setLoading(false);
+    }
   }
 
   return (
@@ -83,6 +87,7 @@ export function LoginModal({ open, onOpenChange }: { open: boolean, onOpenChange
               <Button type="submit" disabled={loading} className="w-full">{loading ? "Logging in..." : "Login"}</Button>
             </DialogFooter>
           </form>
+          {success && <div className="text-green-600 text-sm text-center mt-2">{success}</div>}
           <div className="mt-4 text-center text-sm">
             New here?{' '}
             <button
@@ -107,28 +112,45 @@ export function SignUpModal({ open, onOpenChange }: { open: boolean, onOpenChang
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [remember, setRemember] = useState(false)
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
   const [loading, setLoading] = useState(false)
+  const { signup, signInWithProvider } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setAvatarUrl(ev.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
+    setSuccess("")
     setLoading(true)
-    const res = await signIn("credentials", {
-      redirect: false,
-      name,
-      email,
-      password,
-      isSignUp: "true",
-    })
-    setLoading(false)
-    if (res?.error) setError(res.error)
-    else onOpenChange(false)
+    try {
+      await signup(email, password, name, remember, avatarUrl);
+      localStorage.setItem("auth:user", JSON.stringify({ name, email, avatarUrl }));
+      setLoading(false);
+      setSuccess("Sign up successful!");
+      setTimeout(() => setSuccess(""), 2000);
+      setTimeout(() => onOpenChange(false), 1200);
+    } catch (err: any) {
+      setError(err.message || "Sign up failed");
+      setLoading(false);
+    }
   }
 
   const handleOAuth = (provider: string) => {
-    signIn(provider.toLowerCase(), { callbackUrl: "/" })
-  }
+    signInWithProvider(provider);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -153,6 +175,19 @@ export function SignUpModal({ open, onOpenChange }: { open: boolean, onOpenChang
             onChange={e => setEmail(e.target.value)}
             required
           />
+          <div className="flex items-center gap-2">
+            <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
+              Upload Avatar
+            </Button>
+            {avatarUrl && <img src={avatarUrl} alt="avatar preview" className="w-8 h-8 rounded-full" />}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleAvatarChange}
+            />
+          </div>
           <div className="relative">
             <Input
               type={showPassword ? "text" : "password"}
@@ -185,6 +220,7 @@ export function SignUpModal({ open, onOpenChange }: { open: boolean, onOpenChang
             <Button type="submit" disabled={loading} className="w-full">{loading ? "Signing up..." : "Sign Up"}</Button>
           </DialogFooter>
         </form>
+        {success && <div className="text-green-600 text-sm text-center mt-2">{success}</div>}
         <div className="flex items-center my-4">
           <div className="flex-1 h-px bg-border" />
           <span className="mx-2 text-xs text-muted-foreground">or</span>
