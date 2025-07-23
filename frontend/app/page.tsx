@@ -445,27 +445,7 @@ export default function LandingPagePreview() {
           </motion.div>
 
           {/* App Preview */}
-          <motion.div
-            className="mt-20 relative"
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            <div className="relative rounded-xl border border-border bg-card/50 backdrop-blur-sm p-4">
-              <div className="aspect-video bg-gradient-to-br from-muted/50 to-muted rounded-lg flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Database className="w-8 h-8 text-primary" />
-                  </div>
-                  <p className="text-muted-foreground">Interactive App Preview</p>
-                  <p className="text-sm text-muted-foreground">Dashboard, Analytics & Collaboration Tools</p>
-                </div>
-              </div>
-            </div>
-            {/* Floating elements for visual interest */}
-            <div className="absolute -top-4 -left-4 w-8 h-8 bg-purple-500/20 rounded-full blur-sm" />
-            <div className="absolute -bottom-4 -right-4 w-12 h-12 bg-blue-500/20 rounded-full blur-sm" />
-          </motion.div>
+          {/* Removed interactive app preview section as requested */}
         </div>
       </section>
 

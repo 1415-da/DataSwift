@@ -3,6 +3,7 @@ import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 import TwitterProvider from "next-auth/providers/twitter";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { getDb } from '../../../lib/db';
 
 export default NextAuth({
   providers: [
@@ -44,5 +45,30 @@ export default NextAuth({
   },
   pages: {
     signIn: "/", // Stay on homepage for login/signup
+  },
+  callbacks: {
+    async signIn({ user, account, profile }) {
+      if (account?.provider !== "credentials") {
+        const db = await getDb();
+        const users = db.collection("users");
+        const existing = await users.findOne({ email: user.email });
+        if (!existing) {
+          await users.insertOne({
+            name: user.name,
+            email: user.email,
+            avatarUrl: user.image,
+            category: "free",
+            createdAt: new Date(),
+            lastLogin: new Date(),
+          });
+        } else {
+          await users.updateOne(
+            { email: user.email },
+            { $set: { lastLogin: new Date() } }
+          );
+        }
+      }
+      return true;
+    },
   },
 }); 

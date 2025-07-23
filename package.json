@@ -32,5 +32,8 @@
   "devDependencies": {
     "@types/node": "^22",
     "typescript": "^5"
+  },
+  "dependencies": {
+    "mongodb": "^6.18.0"
   }
 }
