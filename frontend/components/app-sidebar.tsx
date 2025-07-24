@@ -1,7 +1,7 @@
 "use client"
 
 import type * as React from "react"
-import { ChevronDown, Database, TestTube, GraduationCap, BookOpen, Sun, Moon, Laptop } from "lucide-react"
+import { ChevronDown, Database, TestTube, GraduationCap, BookOpen, Sun, Moon, Laptop, BarChart2, FlaskConical, CheckCircle2, Users, Layers, Settings as SettingsIcon } from "lucide-react"
 import { useTheme } from "next-themes"
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -61,18 +61,27 @@ const navigationData = [
       { title: "Model Registry", url: "#" },
     ],
   },
-  {
-    title: "Knowledge Hub",
-    icon: BookOpen,
-    items: [
+  // Knowledge Hub removed
+]
+
+const docsSubItems = [
       { title: "Documentation", url: "/dashboard/knowledgehub/documentation" },
       { title: "Best Practices", url: "/dashboard/knowledgehub/best-practices" },
       { title: "Tutorials", url: "/dashboard/knowledgehub/tutorials" },
       { title: "API Reference", url: "/dashboard/knowledgehub/api" },
       { title: "Community", url: "/dashboard/knowledgehub/community" },
-    ],
-  },
-]
+];
+
+const mainNav = [
+  { title: "Data", url: "/dashboard/data", icon: Database },
+  { title: "EDA", url: "/dashboard/eda", icon: BarChart2 },
+  { title: "ModelLab", url: "/dashboard/modellab", icon: FlaskConical },
+  { title: "Testing", url: "/dashboard/testing", icon: CheckCircle2 },
+  { title: "Collaboration", url: "/dashboard/collaboration", icon: Users },
+  { title: "Docs", icon: BookOpen, subItems: docsSubItems },
+  { title: "History", url: "/dashboard/history", icon: Layers },
+  // KnowledgeHub and Settings removed from this group
+];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { setTheme, theme } = useTheme();
@@ -89,15 +98,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </div>
       </SidebarHeader>
 
+      {/* Main navigation group only */}
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>
-            <span className="text-base font-bold tracking-wide uppercase text-sidebar-foreground/80">Navigation</span>
-          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navigationData.map((item) => (
-                <Collapsible key={item.title} defaultOpen className="group/collapsible mt-2">
+              {mainNav.map((item) => (
+                item.subItems ? (
+                  <Collapsible key={item.title} defaultOpen={false} className="group/collapsible mt-2">
                   <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
                       <SidebarMenuButton className="w-full text-[1rem] font-semibold tracking-tight flex items-center gap-2">
@@ -108,7 +116,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <SidebarMenuSub>
-                        {Array.isArray(item.items) && item.items.map((subItem) => (
+                          {item.subItems.map((subItem) => (
                           <SidebarMenuSubItem key={subItem.title}>
                             <SidebarMenuSubButton asChild>
                               <Link href={subItem.url} prefetch={true} className="pl-7 py-1 block text-[0.97rem] font-normal text-sidebar-foreground/90 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded transition-colors">
@@ -121,6 +129,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     </CollapsibleContent>
                   </SidebarMenuItem>
                 </Collapsible>
+                ) : (
+                  <SidebarMenuItem key={item.title}>
+                    <Link href={item.url} prefetch={true}>
+                      <SidebarMenuButton
+                        className={`w-full text-[1rem] font-semibold tracking-tight flex items-center gap-2 rounded-md transition-colors px-3 py-2 ${pathname.startsWith(item.url) ? 'bg-primary text-primary-foreground shadow' : 'hover:bg-muted hover:text-accent-foreground'}`}
+                        isActive={pathname.startsWith(item.url)}
+                      >
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </SidebarMenuButton>
+                    </Link>
+                  </SidebarMenuItem>
+                )
               ))}
             </SidebarMenu>
           </SidebarGroupContent>

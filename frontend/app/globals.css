@@ -91,3 +91,12 @@
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+@keyframes indeterminate-bar {
+  0% { left: -33%; width: 33%; }
+  50% { left: 33%; width: 33%; }
+  100% { left: 100%; width: 33%; }
+}
+.animate-indeterminate-bar {
+  animation: indeterminate-bar 1.2s infinite linear;
+}
