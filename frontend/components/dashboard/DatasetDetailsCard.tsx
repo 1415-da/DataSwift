@@ -44,25 +44,32 @@ export default function DatasetDetailsCard({ dataset, onRunEDA, onSendToModelLab
         </div>
       </CardHeader>
       <CardContent>
-        <div className="mb-2 text-xs text-muted-foreground">
-          <div><span className="font-semibold">Name:</span> {dataset.name}</div>
-          <div><span className="font-semibold">Source:</span> {dataset.sourceType}</div>
-          <div><span className="font-semibold">Uploaded:</span> {new Date(dataset.uploadDate).toLocaleString()}</div>
-          <div><span className="font-semibold">Rows:</span> {dataset.rowCount}, <span className="font-semibold">Columns:</span> {dataset.colCount}</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-sm text-muted-foreground mb-4">
           <div>
-            <span className="font-semibold">Schema:</span>
-            <div className="inline-block align-top max-h-16 overflow-y-auto ml-1 px-1 bg-muted rounded border border-border w-full max-w-xs" style={{ minWidth: 120, overflowX: 'hidden' }}>
-              <ul className="list-disc pl-4">
-                {visibleSchema.map((item, idx) => (
-                  <li key={idx} className="truncate whitespace-normal break-words text-xs leading-tight">{item}</li>
-                ))}
-              </ul>
-              {schemaList.length > 3 && (
-                <button className="ml-2 text-primary underline text-xs" onClick={() => setShowAllSchema(v => !v)}>
-                  {showAllSchema ? 'Show Less' : `+${schemaList.length - 3} more`}
-                </button>
-              )}
-            </div>
+            <div className="font-semibold text-base mb-1">Name</div>
+            <div className="truncate" title={dataset.name}>{dataset.name}</div>
+          </div>
+          <div>
+            <div className="font-semibold text-base mb-1">Source</div>
+            <div className="capitalize">{dataset.sourceType}</div>
+          </div>
+          <div>
+            <div className="font-semibold text-base mb-1">Uploaded</div>
+            <div>{new Date(dataset.uploadDate).toLocaleString()}</div>
+          </div>
+          <div>
+            <div className="font-semibold text-base mb-1">Shape</div>
+            <div>{dataset.rowCount} rows × {dataset.colCount} columns</div>
+          </div>
+        </div>
+        <div className="mt-4">
+          <div className="font-semibold text-base mb-2">Schema</div>
+          <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto bg-muted rounded border border-border p-2">
+            {dataset.columns.map((col, idx) => (
+              <span key={idx} className="px-2 py-1 rounded bg-card border text-xs font-medium whitespace-nowrap shadow-sm">
+                {col.name} <span className="text-muted-foreground">({col.type})</span>
+              </span>
+            ))}
           </div>
         </div>
       </CardContent>

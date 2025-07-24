@@ -5,6 +5,7 @@ import { ChevronDown, Database, TestTube, GraduationCap, BookOpen, Sun, Moon, La
 import { useTheme } from "next-themes"
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 import {
@@ -72,8 +73,15 @@ const docsSubItems = [
       { title: "Community", url: "/dashboard/knowledgehub/community" },
 ];
 
+const dataSubItems = [
+  { title: "Upload", url: "/dashboard/data#overview" },
+  { title: "Meta Data", url: "/dashboard/data#cleaning" },
+  { title: "Preview", url: "/dashboard/data#preview" },
+  { title: "Actions", url: "/dashboard/data#export" },
+];
+
 const mainNav = [
-  { title: "Data", url: "/dashboard/data", icon: Database },
+  { title: "Data", icon: Database, subItems: dataSubItems },
   { title: "EDA", url: "/dashboard/eda", icon: BarChart2 },
   { title: "ModelLab", url: "/dashboard/modellab", icon: FlaskConical },
   { title: "Testing", url: "/dashboard/testing", icon: CheckCircle2 },
@@ -83,9 +91,78 @@ const mainNav = [
   // KnowledgeHub and Settings removed from this group
 ];
 
+// Helper: map sidebar item title to main page href
+const mainNavHref = {
+  Data: '/dashboard/data',
+  Docs: '/dashboard/knowledgehub/documentation',
+  EDA: '/dashboard/eda',
+  ModelLab: '/dashboard/modellab',
+  Testing: '/dashboard/testing',
+  Collaboration: '/dashboard/collaboration',
+  History: '/dashboard/history',
+};
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { setTheme, theme } = useTheme();
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+  const [activeSection, setActiveSection] = useState('overview');
+  const [manualActiveSection, setManualActiveSection] = useState<string | null>(null);
+  const [hoveredSection, setHoveredSection] = useState<string | null>(null);
+  const [dataOpen, setDataOpen] = useState(false);
+  const [docsOpen, setDocsOpen] = useState(false); // Added state for Docs submenu
+  const [docsActiveHash, setDocsActiveHash] = useState('');
+
+  // Track hash for Docs section
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const updateDocsHash = () => setDocsActiveHash(window.location.hash.replace('#', ''));
+    updateDocsHash();
+    window.addEventListener('hashchange', updateDocsHash);
+    return () => window.removeEventListener('hashchange', updateDocsHash);
+  }, []);
+
+  // Helper: ensure last section is active if scrolled to bottom
+  function isAtBottom() {
+    return (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 2);
+  }
+
+  useEffect(() => {
+    const sectionIds = ['overview', 'cleaning', 'preview', 'export'];
+    const handleScroll = () => {
+      let current = sectionIds[0];
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= 80) { // 80px offset for topbar
+            current = id;
+          }
+        }
+      }
+      // If at bottom of page, force last section active
+      if (isAtBottom()) {
+        current = sectionIds[sectionIds.length - 1];
+      }
+      setActiveSection(current);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Clear manualActiveSection on scroll, hashchange, or after a short timeout
+  useEffect(() => {
+    if (!manualActiveSection) return;
+    const clear = () => setManualActiveSection(null);
+    window.addEventListener('scroll', clear, { passive: true });
+    window.addEventListener('hashchange', clear);
+    const timeout = setTimeout(clear, 700);
+    return () => {
+      window.removeEventListener('scroll', clear);
+      window.removeEventListener('hashchange', clear);
+      clearTimeout(timeout);
+    };
+  }, [manualActiveSection]);
 
   return (
     <Sidebar {...props}>
@@ -105,40 +182,148 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenu>
               {mainNav.map((item) => (
                 item.subItems ? (
-                  <Collapsible key={item.title} defaultOpen={false} className="group/collapsible mt-2">
-                  <SidebarMenuItem>
-                    <CollapsibleTrigger asChild>
-                      <SidebarMenuButton className="w-full text-[1rem] font-semibold tracking-tight flex items-center gap-2">
-                        {item.icon ? <item.icon className="h-4 w-4" /> : null}
-                        <span>{item.title}</span>
-                        <ChevronDown className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
-                      </SidebarMenuButton>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                      <SidebarMenuSub>
-                          {item.subItems.map((subItem) => (
-                          <SidebarMenuSubItem key={subItem.title}>
-                            <SidebarMenuSubButton asChild>
-                              <Link href={subItem.url} prefetch={true} className="pl-7 py-1 block text-[0.97rem] font-normal text-sidebar-foreground/90 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded transition-colors">
-                                {subItem.title}
-                              </Link>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ))}
-                      </SidebarMenuSub>
-                    </CollapsibleContent>
-                  </SidebarMenuItem>
-                </Collapsible>
+                  <Collapsible key={item.title}
+                    open={
+                      item.title === 'Data' ? dataOpen :
+                      item.title === 'Docs' ? docsOpen :
+                      undefined
+                    }
+                    onOpenChange={
+                      item.title === 'Data' ? setDataOpen :
+                      item.title === 'Docs' ? setDocsOpen :
+                      undefined
+                    }
+                    defaultOpen={false}
+                    className="group/collapsible mt-2"
+                  >
+                    <SidebarMenuItem>
+                      <div className="flex items-center">
+                        <Link
+                          href={mainNavHref[item.title as keyof typeof mainNavHref] || '#'}
+                          className="flex-1"
+                          onClick={() => {
+                            // For sections with submenus, set to first subsection; for others, set to section name
+                            if (item.title === 'Data') setManualActiveSection('overview');
+                            else if (item.title === 'Docs') setManualActiveSection('documentation');
+                            else if (item.title === 'EDA') setManualActiveSection('eda');
+                            else if (item.title === 'ModelLab') setManualActiveSection('modellab');
+                            else if (item.title === 'Testing') setManualActiveSection('testing');
+                            else if (item.title === 'Collaboration') setManualActiveSection('collaboration');
+                            else if (item.title === 'History') setManualActiveSection('history');
+                          }}
+                        >
+                          <SidebarMenuButton
+                            className={[
+                              'w-full text-[1rem] font-semibold tracking-tight flex items-center gap-2 relative transition-colors',
+                              (item.title === 'Data' && pathname === '/dashboard/data' && !dataOpen && ['overview', 'cleaning', 'preview', 'export'].includes(activeSection)) ? 'bg-primary/10 text-primary' :
+                              (item.title === 'EDA' && pathname.startsWith('/dashboard/eda')) ? 'bg-primary/10 text-primary' :
+                              (item.title === 'ModelLab' && pathname.startsWith('/dashboard/modellab')) ? 'bg-primary/10 text-primary' :
+                              (item.title === 'Testing' && pathname.startsWith('/dashboard/testing')) ? 'bg-primary/10 text-primary' :
+                              (item.title === 'Collaboration' && pathname.startsWith('/dashboard/collaboration')) ? 'bg-primary/10 text-primary' :
+                              (item.title === 'Docs' && pathname.startsWith('/dashboard/knowledgehub')) ? 'bg-primary/10 text-primary' :
+                              (item.title === 'History' && pathname.startsWith('/dashboard/history')) ? 'bg-primary/10 text-primary' :
+                              ''
+                            ].join(' ')}
+                          >
+                            {/* Show indicator if Data is closed and any of its subsections is active */}
+                            {item.title === 'Data' &&
+                              pathname === '/dashboard/data' &&
+                              !dataOpen &&
+                              ['overview', 'cleaning', 'preview', 'export'].includes(activeSection) && (
+                              <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1.5 rounded-full bg-primary shadow-lg transition-all duration-300" />
+                            )}
+                            {/* Show indicator for other main sections */}
+                            {item.title !== 'Data' && (
+                              ((item.title === 'EDA' && pathname.startsWith('/dashboard/eda')) ||
+                               (item.title === 'ModelLab' && pathname.startsWith('/dashboard/modellab')) ||
+                               (item.title === 'Testing' && pathname.startsWith('/dashboard/testing')) ||
+                               (item.title === 'Collaboration' && pathname.startsWith('/dashboard/collaboration')) ||
+                               (item.title === 'Docs' && pathname.startsWith('/dashboard/knowledgehub')) ||
+                               (item.title === 'History' && pathname.startsWith('/dashboard/history'))
+                              ) && (
+                                <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1.5 rounded-full bg-primary shadow-lg transition-all duration-300" />
+                              )
+                            )}
+                            {item.icon ? <item.icon className="h-4 w-4" /> : null}
+                            <span>{item.title}</span>
+                          </SidebarMenuButton>
+                        </Link>
+                        <CollapsibleTrigger asChild>
+                          <button className="ml-2 p-1 rounded hover:bg-muted transition-colors">
+                            <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                          </button>
+                        </CollapsibleTrigger>
+                      </div>
+                      <CollapsibleContent>
+                        <SidebarMenuSub>
+                            {item.subItems.map((subItem) => {
+                              const hash = subItem.url.split('#')[1] || '';
+                              let isActive = false;
+                              if (item.title === 'Data') {
+                                isActive = pathname === '/dashboard/data' && ((hoveredSection && hoveredSection === hash) || (!hoveredSection && (manualActiveSection ? manualActiveSection === hash : activeSection === hash)));
+                              } else if (item.title === 'Docs') {
+                                isActive = pathname.startsWith('/dashboard/knowledgehub') && ((hoveredSection && hoveredSection === hash) || (!hoveredSection && (manualActiveSection ? manualActiveSection === hash : docsActiveHash === hash)));
+                              }
+                              return (
+                                <SidebarMenuSubItem key={subItem.title}>
+                                  <SidebarMenuSubButton asChild>
+                                    <a
+                                      href={subItem.url}
+                                      className={[
+                                        'pl-7 py-1 block text-[0.97rem] font-normal flex items-center gap-2 transition-colors rounded relative',
+                                        isActive ? 'text-primary font-semibold' : 'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+                                      ].join(' ')}
+                                      onMouseEnter={() => setHoveredSection(hash)}
+                                      onMouseLeave={() => setHoveredSection(null)}
+                                      onClick={e => {
+                                        if (subItem.url.startsWith('/dashboard/data#')) {
+                                          e.preventDefault();
+                                          const hashId = subItem.url.split('#')[1];
+                                          setManualActiveSection(hashId);
+                                          const el = document.getElementById(hashId);
+                                          if (el) {
+                                            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                            window.history.replaceState(null, '', `#${hashId}`);
+                                          }
+                                        } else if (subItem.url.startsWith('/dashboard/knowledgehub/documentation#')) {
+                                          e.preventDefault();
+                                          const hashId = subItem.url.split('#')[1];
+                                          setManualActiveSection(hashId);
+                                          setDocsActiveHash(hashId);
+                                          const el = document.getElementById(hashId);
+                                          if (el) {
+                                            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                            window.history.replaceState(null, '', `#${hashId}`);
+                                          }
+                                        }
+                                      }}
+                                    >
+                                      {/* No dot/bar for Docs subsections */}
+                                      <span className="ml-3">{subItem.title}</span>
+                                    </a>
+                                  </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                              );
+                            })}
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </SidebarMenuItem>
+                  </Collapsible>
                 ) : (
                   <SidebarMenuItem key={item.title}>
                     <Link href={item.url} prefetch={true}>
-                      <SidebarMenuButton
-                        className={`w-full text-[1rem] font-semibold tracking-tight flex items-center gap-2 rounded-md transition-colors px-3 py-2 ${pathname.startsWith(item.url) ? 'bg-primary text-primary-foreground shadow' : 'hover:bg-muted hover:text-accent-foreground'}`}
-                        isActive={pathname.startsWith(item.url)}
-                      >
-                        <item.icon className="h-4 w-4" />
-                        <span>{item.title}</span>
-                      </SidebarMenuButton>
+                      <div className="relative w-full">
+                        {pathname.startsWith(item.url) && (
+                          <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1.5 rounded-full bg-primary shadow-lg transition-all duration-300" />
+                        )}
+                        <SidebarMenuButton
+                          className={`w-full text-[1rem] font-semibold tracking-tight flex items-center gap-2 rounded-md transition-colors px-3 py-2 ${pathname.startsWith(item.url) ? 'bg-primary/10 text-primary shadow' : 'hover:bg-muted hover:text-accent-foreground'}`}
+                          isActive={pathname.startsWith(item.url)}
+                        >
+                          <item.icon className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+                          <span>{item.title}</span>
+                        </SidebarMenuButton>
+                      </div>
                     </Link>
                   </SidebarMenuItem>
                 )

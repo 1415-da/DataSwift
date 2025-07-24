@@ -21,6 +21,7 @@ interface DatasetPreviewCardProps {
   onClean: (id: string, method: string) => void;
   onSave: (id: string) => void;
   onRevert: (id: string) => void;
+  showSaveRevert?: boolean;
 }
 
 const typeColors: Record<string, string> = {
@@ -31,7 +32,7 @@ const typeColors: Record<string, string> = {
   default: 'bg-muted text-foreground',
 };
 
-export default function DatasetPreviewCard({ dataset, onClean, onSave, onRevert }: DatasetPreviewCardProps) {
+export default function DatasetPreviewCard({ dataset, onClean, onSave, onRevert, showSaveRevert }: DatasetPreviewCardProps) {
   return (
     <Card gradient className="mb-6">
       <CardHeader>
@@ -67,7 +68,10 @@ export default function DatasetPreviewCard({ dataset, onClean, onSave, onRevert 
         </div>
         <div className="mb-2">
           <div className="font-semibold mb-1">Metadata</div>
-          <div className="text-xs text-muted-foreground">
+          <div
+            className="text-xs text-muted-foreground max-h-32 min-h-[6rem] bg-muted rounded p-2 border border-border overflow-y-auto w-full"
+            style={{ minWidth: 0 }}
+          >
             <div>Schema: {dataset.columns.map(col => `${col.name} (${col.type})`).join(', ')}</div>
             <div>Rows: {dataset.rowCount}, Columns: {dataset.colCount}</div>
             {dataset.stats && <div>Sample Stats: {JSON.stringify(dataset.stats)}</div>}
@@ -75,8 +79,12 @@ export default function DatasetPreviewCard({ dataset, onClean, onSave, onRevert 
         </div>
       </CardContent>
       <CardFooter className="justify-end gap-2 flex-wrap">
-        <Button variant="secondary" size="sm" onClick={() => onSave(dataset.id)}><Save className="w-4 h-4 mr-1" />Save</Button>
-        <Button variant="outline" size="sm" onClick={() => onRevert(dataset.id)}><Undo2 className="w-4 h-4 mr-1" />Revert</Button>
+        {showSaveRevert && (
+          <>
+            <Button variant="secondary" size="sm" onClick={() => onSave(dataset.id)}><Save className="w-4 h-4 mr-1" />Save</Button>
+            <Button variant="outline" size="sm" onClick={() => onRevert(dataset.id)}><Undo2 className="w-4 h-4 mr-1" />Revert</Button>
+          </>
+        )}
       </CardFooter>
     </Card>
   );
