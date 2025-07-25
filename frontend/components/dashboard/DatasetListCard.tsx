@@ -22,9 +22,10 @@ interface DatasetListCardProps {
   onClean: (id: string) => void;
   onDownload: (id: string) => void;
   onDelete: (id: string) => void;
+  onRunEDA: (id: string) => void; // Add this prop
 }
 
-export default function DatasetListCard({ datasets, onPreview, onEdit, onClean, onDownload, onDelete }: DatasetListCardProps) {
+export default function DatasetListCard({ datasets, onPreview, onEdit, onClean, onDownload, onDelete, onRunEDA }: DatasetListCardProps) {
   return (
     <Card gradient className="mb-6">
       <CardHeader>
@@ -61,6 +62,7 @@ export default function DatasetListCard({ datasets, onPreview, onEdit, onClean, 
                     <Button size="icon" variant="ghost" onClick={() => onClean(ds.id)} title="Clean"><SlidersHorizontal className="w-4 h-4" /></Button>
                     <Button size="icon" variant="ghost" onClick={() => onDownload(ds.id)} title="Download"><Download className="w-4 h-4" /></Button>
                     <Button size="icon" variant="ghost" onClick={() => onDelete(ds.id)} title="Delete"><Trash2 className="w-4 h-4 text-destructive" /></Button>
+                    <Button size="sm" variant="outline" onClick={() => onRunEDA(ds.id)} title="Run EDA">Run EDA</Button>
                   </td>
                 </tr>
               ))}

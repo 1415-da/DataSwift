@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, UploadFile, File, Query, Response,
 from typing import List, Dict, Any, Optional
 from services.eda_service import EDAService
 from datetime import datetime
+from fastapi.responses import StreamingResponse
 
 # In-memory metadata for datasets
 DATASET_METADATA = {}
@@ -67,6 +68,22 @@ async def export_data(dataset_id: str = Query(...)):
     try:
         csv_bytes = EDAService.export_dataset(dataset_id)
         return Response(content=csv_bytes, media_type="text/csv")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/export_report")
+async def export_report(dataset_id: str = Query(...), format: str = Query('html')):
+    """Export EDA report as PDF or HTML"""
+    try:
+        report_bytes = EDAService.export_report(dataset_id, format)
+        if format == 'pdf':
+            return Response(content=report_bytes, media_type='application/pdf', headers={
+                'Content-Disposition': f'attachment; filename="eda_report_{dataset_id}.pdf"'
+            })
+        else:
+            return Response(content=report_bytes, media_type='text/html', headers={
+                'Content-Disposition': f'attachment; filename="eda_report_{dataset_id}.html"'
+            })
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -183,5 +200,32 @@ async def delete_dataset(dataset_id: str = Query(...)):
         if dataset_id in DATASET_METADATA:
             del DATASET_METADATA[dataset_id]
         return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/correlation")
+async def correlation_matrix(dataset_id: str = Query(...)):
+    """Return correlation matrix for numeric columns of the dataset"""
+    try:
+        result = EDAService.correlation_matrix(dataset_id)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/outliers")
+async def outliers(dataset_id: str = Query(...)):
+    """Return outlier info for numeric columns of the dataset"""
+    try:
+        result = EDAService.detect_outliers(dataset_id)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/insights")
+async def insights(dataset_id: str = Query(...)):
+    """Return AI-generated insights for the dataset"""
+    try:
+        result = EDAService.generate_insights(dataset_id)
+        return result
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

@@ -80,9 +80,21 @@ const dataSubItems = [
   { title: "Actions", url: "/dashboard/data#export" },
 ];
 
+// Add EDA subsections for the sidebar
+const edaSubItems = [
+  { title: "Overview", url: "/dashboard/eda#overview" },
+  { title: "Summary Stats", url: "/dashboard/eda#summary" },
+  { title: "Visualizations", url: "/dashboard/eda#visualizations" },
+  { title: "Correlations", url: "/dashboard/eda#correlations" },
+  { title: "Outliers", url: "/dashboard/eda#outliers" },
+  { title: "Insights", url: "/dashboard/eda#insights" },
+  { title: "Export", url: "/dashboard/eda#export" },
+];
+
+// In mainNav, update the EDA item to include subItems
 const mainNav = [
   { title: "Data", icon: Database, subItems: dataSubItems },
-  { title: "EDA", url: "/dashboard/eda", icon: BarChart2 },
+  { title: "EDA", url: "/dashboard/eda", icon: BarChart2, subItems: edaSubItems },
   { title: "ModelLab", url: "/dashboard/modellab", icon: FlaskConical },
   { title: "Testing", url: "/dashboard/testing", icon: CheckCircle2 },
   { title: "Collaboration", url: "/dashboard/collaboration", icon: Users },
@@ -102,6 +114,17 @@ const mainNavHref = {
   History: '/dashboard/history',
 };
 
+// Add EDA section IDs for scroll tracking
+const edaSectionIds = [
+  'overview',
+  'summary',
+  'visualizations',
+  'correlations',
+  'outliers',
+  'insights',
+  'export',
+];
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { setTheme, theme } = useTheme();
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
@@ -111,6 +134,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [dataOpen, setDataOpen] = useState(false);
   const [docsOpen, setDocsOpen] = useState(false); // Added state for Docs submenu
   const [docsActiveHash, setDocsActiveHash] = useState('');
+  // Add EDA section IDs for scroll tracking
+  const [activeEdaSection, setActiveEdaSection] = useState('overview');
 
   // Track hash for Docs section
   useEffect(() => {
@@ -120,6 +145,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     window.addEventListener('hashchange', updateDocsHash);
     return () => window.removeEventListener('hashchange', updateDocsHash);
   }, []);
+
+  // Restore scroll tracking and manualActiveSection logic for EDA and Data subItems
+  // 1. Re-add useEffect for scroll tracking for EDA and Data sections
+  // 2. Restore state: activeEdaSection, activeSection, manualActiveSection, setActiveEdaSection, setActiveSection, setManualActiveSection
+  // 3. In the rendering of subItems (for EDA and Data), restore isActive logic to:
+  //    isActive = pathname === '/dashboard/eda' && ((hoveredSection && hoveredSection === hash) || (!hoveredSection && (manualActiveSection ? manualActiveSection === hash : activeEdaSection === hash)));
+  //    (and similar for Data)
+  // 4. onClick for subItems: setManualActiveSection(hashId) and scrollIntoView
+  // 5. Restore any code that sets or uses activeEdaSection, activeSection, manualActiveSection for highlight
 
   // Helper: ensure last section is active if scrolled to bottom
   function isAtBottom() {
@@ -261,6 +295,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                               let isActive = false;
                               if (item.title === 'Data') {
                                 isActive = pathname === '/dashboard/data' && ((hoveredSection && hoveredSection === hash) || (!hoveredSection && (manualActiveSection ? manualActiveSection === hash : activeSection === hash)));
+                              } else if (item.title === 'EDA') {
+                                isActive = pathname === '/dashboard/eda' && ((hoveredSection && hoveredSection === hash) || (!hoveredSection && (manualActiveSection ? manualActiveSection === hash : activeEdaSection === hash)));
                               } else if (item.title === 'Docs') {
                                 isActive = pathname.startsWith('/dashboard/knowledgehub') && ((hoveredSection && hoveredSection === hash) || (!hoveredSection && (manualActiveSection ? manualActiveSection === hash : docsActiveHash === hash)));
                               }
@@ -279,7 +315,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                         if (subItem.url.startsWith('/dashboard/data#')) {
                                           e.preventDefault();
                                           const hashId = subItem.url.split('#')[1];
-                                          setManualActiveSection(hashId);
+                                          const el = document.getElementById(hashId);
+                                          if (el) {
+                                            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                            window.history.replaceState(null, '', `#${hashId}`);
+                                          }
+                                        } else if (subItem.url.startsWith('/dashboard/eda#')) {
+                                          e.preventDefault();
+                                          const hashId = subItem.url.split('#')[1];
                                           const el = document.getElementById(hashId);
                                           if (el) {
                                             el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -288,7 +331,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                         } else if (subItem.url.startsWith('/dashboard/knowledgehub/documentation#')) {
                                           e.preventDefault();
                                           const hashId = subItem.url.split('#')[1];
-                                          setManualActiveSection(hashId);
                                           setDocsActiveHash(hashId);
                                           const el = document.getElementById(hashId);
                                           if (el) {
