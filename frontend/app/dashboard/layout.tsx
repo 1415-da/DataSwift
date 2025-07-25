@@ -1,10 +1,10 @@
 'use client';
 import React from 'react';
 import dynamic from 'next/dynamic';
-import Topbar from '@/components/dashboard/Topbar';
 import { SidebarProvider } from '@/components/ui/sidebar';
 
 const AppSidebar = dynamic(() => import('@/components/app-sidebar').then(mod => mod.AppSidebar), { ssr: false });
+const Topbar = dynamic(() => import('@/components/dashboard/Topbar'), { ssr: false });
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (

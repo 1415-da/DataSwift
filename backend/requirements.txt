@@ -12,6 +12,7 @@ xgboost==2.0.3
 sqlalchemy==2.0.29
 databases==0.9.0  # Use the latest compatible version
 asyncpg==0.29.0  # If using PostgreSQL
+pymongo==4.6.3
 
 # Environment
 python-dotenv==1.0.1
