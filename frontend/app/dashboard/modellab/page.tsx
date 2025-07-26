@@ -1157,10 +1157,12 @@ Notes:
                       <span className="font-semibold text-sm text-foreground">API Endpoint:</span>
                       <button
                         onClick={() => {
-                          navigator.clipboard.writeText(latestCompletedExperiment.endpoint_url);
-                          setCopyClicked(true);
-                          toast({ title: 'Copied!', description: 'Endpoint URL copied to clipboard.' });
-                          setTimeout(() => setCopyClicked(false), 2000);
+                          if (latestCompletedExperiment.endpoint_url) {
+                            navigator.clipboard.writeText(latestCompletedExperiment.endpoint_url);
+                            setCopyClicked(true);
+                            toast({ title: 'Copied!', description: 'Endpoint URL copied to clipboard.' });
+                            setTimeout(() => setCopyClicked(false), 2000);
+                          }
                         }}
                         className="px-2 py-1 text-xs bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors"
                       >
