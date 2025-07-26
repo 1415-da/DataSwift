@@ -22,10 +22,10 @@ interface DatasetDetailsCardProps {
   dataset: DatasetDetails;
   onRunEDA: (id: string) => void;
   onSendToModelLab: (id: string) => void;
-  onViewReports: (id: string) => void;
+  onViewReports?: (id: string) => void; // Make optional
 }
 
-export default function DatasetDetailsCard({ dataset, onRunEDA, onSendToModelLab, onViewReports }: DatasetDetailsCardProps) {
+export default function DatasetDetailsCard({ dataset, onRunEDA, onSendToModelLab }: DatasetDetailsCardProps) {
   const [showAllSchema, setShowAllSchema] = useState(false);
   const schemaList = dataset.columns.map(col => `${col.name} (${col.type})`);
   const visibleSchema = showAllSchema ? schemaList : schemaList.slice(0, 3);

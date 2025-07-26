@@ -1,8 +1,9 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File, Query, Response, Body
 from typing import List, Dict, Any, Optional
-from services.eda_service import EDAService
+from ..services.eda_service import EDAService
 from datetime import datetime
 from fastapi.responses import StreamingResponse
+import pandas as pd
 
 # In-memory metadata for datasets
 DATASET_METADATA = {}
@@ -42,7 +43,29 @@ async def upload_data(file: UploadFile = File(...)):
 @router.get("/list")
 async def list_datasets():
     """List all uploaded datasets (in memory)"""
-    return list(DATASET_METADATA.values())
+    from ..services.eda_service import DATASETS
+    datasets = []
+    for dataset_id, metadata in DATASET_METADATA.items():
+        df = DATASETS.get(dataset_id)
+        if df is not None:
+            # Map pandas dtypes to frontend-friendly types
+            def map_dtype(dtype):
+                if pd.api.types.is_numeric_dtype(dtype):
+                    return 'number'
+                elif pd.api.types.is_datetime64_any_dtype(dtype):
+                    return 'date'
+                elif pd.api.types.is_bool_dtype(dtype):
+                    return 'boolean'
+                else:
+                    return 'string'
+            
+            dataset_info = {
+                **metadata,
+                "features": list(df.columns),
+                "types": {col: map_dtype(dtype) for col, dtype in df.dtypes.items()}
+            }
+            datasets.append(dataset_info)
+    return datasets
 
 @router.get("/analyze")
 async def analyze_data(dataset_id: str = Query(...)):

@@ -91,11 +91,18 @@ const edaSubItems = [
   { title: "Export", url: "/dashboard/eda#export" },
 ];
 
-// In mainNav, update the EDA item to include subItems
+const modellabSubItems = [
+  { title: "Dataset Summary", url: "/dashboard/modellab#select-dataset" },
+  { title: "Configure Model", url: "/dashboard/modellab#configure-model" },
+  { title: "Experiments", url: "/dashboard/modellab#experiments" },
+  { title: "Results & Analysis", url: "/dashboard/modellab#results" },
+  { title: "Export & Deployment", url: "/dashboard/modellab#export" },
+];
+
 const mainNav = [
   { title: "Data", icon: Database, subItems: dataSubItems },
   { title: "EDA", url: "/dashboard/eda", icon: BarChart2, subItems: edaSubItems },
-  { title: "ModelLab", url: "/dashboard/modellab", icon: FlaskConical },
+  { title: "ModelLab", url: "/dashboard/modellab", icon: FlaskConical, subItems: modellabSubItems },
   { title: "Testing", url: "/dashboard/testing", icon: CheckCircle2 },
   { title: "Collaboration", url: "/dashboard/collaboration", icon: Users },
   { title: "Docs", icon: BookOpen, subItems: docsSubItems },
@@ -125,6 +132,14 @@ const edaSectionIds = [
   'export',
 ];
 
+const modellabSectionIds = [
+  'select-dataset',
+  'configure-model',
+  'experiments',
+  'results',
+  'export',
+];
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { setTheme, theme } = useTheme();
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
@@ -136,6 +151,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [docsActiveHash, setDocsActiveHash] = useState('');
   // Add EDA section IDs for scroll tracking
   const [activeEdaSection, setActiveEdaSection] = useState('overview');
+  const [activeModelLabSection, setActiveModelLabSection] = useState('select-dataset');
 
   // Track hash for Docs section
   useEffect(() => {
@@ -197,6 +213,31 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       clearTimeout(timeout);
     };
   }, [manualActiveSection]);
+
+  // Scroll tracking for ModelLab
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!pathname.startsWith('/dashboard/modellab')) return;
+    const handleScroll = () => {
+      let current = modellabSectionIds[0];
+      for (const id of modellabSectionIds) {
+        const el = document.getElementById(id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= 80) {
+            current = id;
+          }
+        }
+      }
+      if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 2)) {
+        current = modellabSectionIds[modellabSectionIds.length - 1];
+      }
+      setActiveModelLabSection(current);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [pathname]);
 
   return (
     <Sidebar {...props}>
@@ -299,6 +340,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 isActive = pathname === '/dashboard/eda' && ((hoveredSection && hoveredSection === hash) || (!hoveredSection && (manualActiveSection ? manualActiveSection === hash : activeEdaSection === hash)));
                               } else if (item.title === 'Docs') {
                                 isActive = pathname.startsWith('/dashboard/knowledgehub') && ((hoveredSection && hoveredSection === hash) || (!hoveredSection && (manualActiveSection ? manualActiveSection === hash : docsActiveHash === hash)));
+                              } else if (item.title === 'ModelLab') {
+                                isActive = pathname === '/dashboard/modellab' && ((hoveredSection && hoveredSection === hash) || (!hoveredSection && (manualActiveSection ? manualActiveSection === hash : activeModelLabSection === hash)));
                               }
                               return (
                                 <SidebarMenuSubItem key={subItem.title}>
@@ -336,6 +379,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                           if (el) {
                                             el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                                             window.history.replaceState(null, '', `#${hashId}`);
+                                          }
+                                        } else if (subItem.url.startsWith('/dashboard/modellab#')) {
+                                          e.preventDefault();
+                                          const hashId = subItem.url.split('#')[1];
+                                          setManualActiveSection(hashId);
+                                          const el = document.getElementById(hashId);
+                                          if (el) {
+                                            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                                           }
                                         }
                                       }}

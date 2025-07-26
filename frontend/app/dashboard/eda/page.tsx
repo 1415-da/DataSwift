@@ -190,10 +190,9 @@ const EDAOverviewPage = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto flex flex-col gap-y-8 px-4 py-10 animate-fade-in motion-safe:animate-fade-in">
-      <h1 className="text-2xl font-bold mb-4">EDA Overview</h1>
+    <div className="max-w-5xl mx-auto flex flex-col gap-y-8 px-4 animate-fade-in motion-safe:animate-fade-in">
       {/* 1. Dataset Selection Card */}
-      <Card title="Select Dataset">
+      <Card title={<span id="select-dataset" className="text-3xl font-extrabold">Select Dataset</span>}>
         <div className="space-y-4">
           {loading ? (
             <div>Loading datasets...</div>
@@ -241,7 +240,7 @@ const EDAOverviewPage = () => {
       </Card>
 
       {/* 2. Run EDA Card */}
-      <Card title="Run Automated EDA">
+      <Card title={<span id="run-eda" className="text-3xl font-extrabold">Run Automated EDA</span>}>
         <div className="flex items-center gap-4">
           <button
             className="px-4 py-2 border border-primary text-primary font-semibold rounded bg-transparent hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary/50 flex items-center gap-2"
@@ -259,7 +258,7 @@ const EDAOverviewPage = () => {
       {runEDA && !analyzeLoading && (
         <section className="grid gap-8 md:grid-cols-2">
           {/* Summary Stats */}
-          <Card title="Summary Stats">
+          <Card title={<span id="summary-stats" className="text-3xl font-extrabold">Summary Stats</span>}>
             {analyze && analyze.dtypes && Object.entries(analyze.dtypes).filter(([_, typ]) => typ === 'number').length === 0 ? (
               <div className="text-muted-foreground">No numeric columns to visualize.</div>
             ) : (
@@ -278,7 +277,7 @@ const EDAOverviewPage = () => {
             )}
           </Card>
           {/* Visualizations */}
-          <Card title="Visualizations">
+          <Card title={<span id="visualizations" className="text-3xl font-extrabold">Visualizations</span>}>
             {analyze && analyze.dtypes && Object.entries(analyze.dtypes).filter(([_, typ]) => typ === 'string').length > 0 ? (
               <div className="grid grid-cols-1 gap-4">
                 {analyze.dtypes && Object.entries(analyze.dtypes).filter(([_, typ]) => typ === 'string').map(([col]) => {
@@ -326,7 +325,7 @@ const EDAOverviewPage = () => {
             ) : <div className="text-muted-foreground">No categorical columns to visualize.</div>}
           </Card>
           {/* Correlations */}
-          <Card title="Correlations">
+          <Card title={<span id="correlations" className="text-3xl font-extrabold">Correlations</span>}>
             {correlationLoading ? (
               <div>Loading correlation heatmap...</div>
             ) : correlationError ? (
@@ -336,7 +335,7 @@ const EDAOverviewPage = () => {
             ) : <div className="text-muted-foreground">Not enough numeric columns for correlation.</div>}
           </Card>
           {/* Outliers */}
-          <Card title="Outliers">
+          <Card title={<span id="outliers" className="text-3xl font-extrabold">Outliers</span>}>
             {outliersLoading ? (
               <div>Loading outlier report...</div>
             ) : outliersError ? (
@@ -362,43 +361,59 @@ const EDAOverviewPage = () => {
               </table>
             ) : <div className="text-muted-foreground">No outlier data.</div>}
           </Card>
-          {/* Insights */}
-          <Card title="AI Insights">
-            {insightsLoading ? (
-              <div>Loading insights...</div>
-            ) : insightsError ? (
-              <div className="text-red-500">{insightsError}</div>
-            ) : insights && insights.length > 0 ? (
-              <ul className="flex flex-col gap-2">
-                {insights.map((insight: Insight, i: number) => {
-                  let color = 'text-blue-700';
-                  let icon = <Info className="w-5 h-5 mr-2" />;
-                  if (insight.type === 'warning') {
-                    color = 'text-red-700';
-                    icon = <AlertTriangle className="w-5 h-5 mr-2" />;
-                  } else if (insight.type === 'suggestion') {
-                    color = 'text-yellow-700';
-                    icon = <Lightbulb className="w-5 h-5 mr-2" />;
-                  }
-                  return (
-                    <li key={i} className="flex items-start gap-2">
-                      {icon}
-                      <div>
-                        <span className={`font-semibold capitalize text-sm ${color}`}>{insight.type}</span>
-                        <span className="ml-2 text-base leading-snug text-foreground">{insight.message}</span>
+          {/* Insights Section */}
+          <div className="md:col-span-2">
+            <Card
+              title={
+                <span id="insights" className="text-3xl font-bold tracking-tight text-foreground">
+                  Insights
+                </span>
+              }
+            >
+              {insightsLoading ? (
+                <div className="py-6 text-center text-muted-foreground text-sm">Loading insights...</div>
+              ) : insightsError ? (
+                <div className="py-6 text-center text-red-500 text-sm">{insightsError}</div>
+              ) : insights && insights.length > 0 ? (
+                <div className="space-y-4 max-h-[500px] overflow-y-auto p-1">
+                  {insights.map((insight: Insight, i: number) => {
+                    let color = 'text-blue-700';
+                    let icon = <Info className="w-5 h-5 text-blue-600" />;
+                    if (insight.type === 'warning') {
+                      color = 'text-red-700';
+                      icon = <AlertTriangle className="w-5 h-5 text-red-600" />;
+                    } else if (insight.type === 'suggestion') {
+                      color = 'text-yellow-700';
+                      icon = <Lightbulb className="w-5 h-5 text-yellow-600" />;
+                    }
+
+                    return (
+                      <div
+                        key={i}
+                        className="flex items-start gap-3"
+                      >
+                        {icon}
+                        <div className="flex-1">
+                          <p className={`font-medium text-sm ${color} capitalize mb-1`}>
+                            {insight.type}
+                          </p>
+                          <p className="text-sm text-foreground leading-relaxed">{insight.message}</p>
+                        </div>
                       </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : <div className="text-muted-foreground">No AI insights available.</div>}
-          </Card>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="py-6 text-center text-muted-foreground text-sm">No AI insights available.</div>
+              )}
+            </Card>
+          </div>
         </section>
       )}
 
       {/* 4. Export & Collaboration Card (Download full report, feedback, etc.) */}
       {runEDA && !analyzeLoading && (
-        <Card title="Export">
+        <Card title={<span id="export" className="text-3xl font-extrabold">Export</span>}>
           <div className="flex gap-4 items-center">
             <button
               className="flex items-center gap-2 px-3 py-2 rounded border border-primary text-primary font-semibold bg-transparent hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary/50"
