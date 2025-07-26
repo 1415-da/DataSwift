@@ -365,47 +365,62 @@ const EDAOverviewPage = () => {
           <div className="md:col-span-2">
             <Card
               title={
-                <span id="insights" className="text-3xl font-bold tracking-tight text-foreground">
+                <span id="insights" className="text-3xl font-extrabold">
                   Insights
                 </span>
               }
             >
-              {insightsLoading ? (
-                <div className="py-6 text-center text-muted-foreground text-sm">Loading insights...</div>
-              ) : insightsError ? (
-                <div className="py-6 text-center text-red-500 text-sm">{insightsError}</div>
-              ) : insights && insights.length > 0 ? (
-                <div className="space-y-4 max-h-[500px] overflow-y-auto p-1">
-                  {insights.map((insight: Insight, i: number) => {
-                    let color = 'text-blue-700';
-                    let icon = <Info className="w-5 h-5 text-blue-600" />;
-                    if (insight.type === 'warning') {
-                      color = 'text-red-700';
-                      icon = <AlertTriangle className="w-5 h-5 text-red-600" />;
-                    } else if (insight.type === 'suggestion') {
-                      color = 'text-yellow-700';
-                      icon = <Lightbulb className="w-5 h-5 text-yellow-600" />;
-                    }
+              <div className="w-full min-h-[200px]">
+                {insightsLoading ? (
+                  <div className="flex justify-center items-center h-40 text-muted-foreground">
+                    Loading insights...
+                  </div>
+                ) : insightsError ? (
+                  <div className="text-red-500 text-center">{insightsError}</div>
+                ) : insights && insights.length > 0 ? (
+                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {insights.map((insight: Insight, i: number) => {
+                      const baseIconClasses = "w-5 h-5 mr-2 mt-1 shrink-0";
+                      const typeStyles = {
+                        info: {
+                          color: "text-blue-700",
+                          icon: <Info className={baseIconClasses} />,
+                        },
+                        warning: {
+                          color: "text-red-700",
+                          icon: <AlertTriangle className={baseIconClasses} />,
+                        },
+                        suggestion: {
+                          color: "text-yellow-700",
+                          icon: <Lightbulb className={baseIconClasses} />,
+                        },
+                      };
 
-                    return (
-                      <div
-                        key={i}
-                        className="flex items-start gap-3"
-                      >
-                        {icon}
-                        <div className="flex-1">
-                          <p className={`font-medium text-sm ${color} capitalize mb-1`}>
-                            {insight.type}
-                          </p>
-                          <p className="text-sm text-foreground leading-relaxed">{insight.message}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="py-6 text-center text-muted-foreground text-sm">No AI insights available.</div>
-              )}
+                      const type = insight.type as keyof typeof typeStyles;
+                      const { icon, color } = typeStyles[type] || typeStyles["info"];
+
+                      return (
+                        <li
+                          key={i}
+                          className="flex items-start gap-3 bg-muted rounded-xl p-5 border border-border shadow-sm hover:shadow-md transition-shadow"
+                        >
+                          {icon}
+                          <div className="flex-1">
+                            <div className={`font-semibold text-sm capitalize ${color}`}>
+                              {insight.type}
+                            </div>
+                            <div className="text-base text-foreground leading-snug mt-1">
+                              {insight.message}
+                            </div>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <div className="text-muted-foreground text-center">No AI insights available.</div>
+                )}
+              </div>
             </Card>
           </div>
         </section>

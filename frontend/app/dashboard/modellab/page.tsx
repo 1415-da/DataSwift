@@ -98,7 +98,7 @@ const METRICS: Record<string, { value: string; label: string }[]> = {
   ],
 };
 
-const Card = ({ title, children, actions }: { title: string; children: React.ReactNode; actions?: React.ReactNode }) => (
+const Card = ({ title, children, actions }: { title: React.ReactNode; children: React.ReactNode; actions?: React.ReactNode }) => (
   <section className="bg-gradient-to-br from-card/95 to-background/80 rounded-lg shadow-lg p-8 w-full box-border min-w-0 border-l-4 border-primary/40 transition-transform duration-200 hover:scale-[1.02] hover:shadow-xl hover:border-primary/80 backdrop-blur-md bg-opacity-80 animate-fade-in motion-safe:animate-fade-in mb-8">
     <div className="flex items-center justify-between mb-4">
       <h2 className="text-xl font-bold tracking-tight">{title}</h2>
@@ -1172,17 +1172,7 @@ Notes:
                     <div className="font-mono text-sm bg-background px-3 py-2 rounded border text-foreground break-all">
                       {latestCompletedExperiment.endpoint_url}
                     </div>
-                    <div className="mt-3 pt-3 border-t border-border">
-                      <button
-                        className="w-full px-4 py-2 rounded-lg bg-primary text-primary-foreground font-semibold border border-primary shadow hover:bg-primary/90 hover:border-white transition-all"
-                        onClick={() => {
-                          // Navigate to testing section
-                          window.location.href = '/dashboard/testing';
-                        }}
-                      >
-                        Go to Testing Section
-                      </button>
-                    </div>
+
                   </div>
                 )}
               </div>
@@ -1261,7 +1251,7 @@ Notes:
       {/* View/Deploy/Batch Predict Modal */}
       {viewModal && viewExp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-background rounded-2xl shadow-2xl max-w-lg w-full p-8 border border-border relative animate-fade-in text-foreground">
+          <div className="bg-background rounded-2xl shadow-2xl max-w-lg w-full max-h-[80vh] p-8 border border-border relative animate-fade-in text-foreground overflow-y-auto">
             <button className="absolute top-3 right-3 text-2xl text-muted-foreground hover:text-primary transition" onClick={() => setViewModal(false)}>&times;</button>
             <h2 className="text-2xl font-bold mb-4 text-primary">Experiment Details</h2>
             {modalLoading ? <div className="animate-pulse">Loading...</div> : (
@@ -1307,6 +1297,13 @@ Notes:
                   </div>
                 )}
                 {modalStatus === 'complete' && modalDeployed && (
+                  <div className="mt-4">
+                    <button className="inline-block px-5 py-2 rounded-lg bg-green-600 text-white font-semibold border border-green-600 shadow cursor-default">
+                      Deployed
+                    </button>
+                  </div>
+                )}
+                {modalStatus === 'complete' && modalDeployed && (
                   <div className="mt-6">
                     <div className="font-semibold mb-2 text-primary">Model Testing</div>
                     <div className="mb-3 p-3 bg-muted/50 rounded-lg border border-border">
@@ -1337,14 +1334,28 @@ Notes:
       {/* Delete confirmation modal */}
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6 relative animate-fade-in">
-            <h2 className="text-lg font-bold mb-2">Delete Experiment?</h2>
-            <div className="mb-4">Are you sure you want to delete this experiment? This action cannot be undone.</div>
-            <div className="flex gap-2 justify-end">
-              <button className="px-4 py-2 rounded bg-gray-200" onClick={() => setDeleteConfirm(null)}>Cancel</button>
-              <button className="px-4 py-2 rounded bg-destructive text-white font-semibold" onClick={confirmDelete}>Delete</button>
+          <div className="bg-background rounded-2xl shadow-2xl max-w-sm w-full p-8 border border-border relative animate-fade-in text-foreground">
+            <h2 className="text-2xl font-bold mb-4 text-primary">Delete Experiment?</h2>
+            <div className="mb-6 text-foreground">Are you sure you want to delete this experiment? This action cannot be undone.</div>
+            <div className="flex gap-3 justify-end">
+              <button className="px-5 py-2 rounded-lg bg-muted text-foreground font-semibold border border-border hover:bg-muted/80 transition-all" onClick={() => setDeleteConfirm(null)}>Cancel</button>
+              <button className="px-5 py-2 rounded-lg bg-destructive text-destructive-foreground font-semibold border border-destructive hover:bg-destructive/90 transition-all" onClick={confirmDelete}>Delete</button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Testing Section Button - Only show when model is trained */}
+      {latestCompletedExperiment && latestCompletedExperiment.metrics && (
+        <div className="fixed bottom-8 right-8 z-50">
+          <button
+            className="px-5 py-2 rounded-lg bg-primary text-primary-foreground font-semibold border border-primary shadow-lg hover:bg-primary/90 hover:border-white transition-all"
+            onClick={() => {
+              window.location.href = '/dashboard/testing';
+            }}
+          >
+            Go to Testing
+          </button>
         </div>
       )}
     </div>
