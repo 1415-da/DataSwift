@@ -1,7 +1,7 @@
 "use client"
 
 import type * as React from "react"
-import { ChevronDown, Database, TestTube, GraduationCap, BookOpen, Sun, Moon, Laptop, BarChart2, FlaskConical, CheckCircle2, Users, Layers, Settings as SettingsIcon } from "lucide-react"
+import { ChevronDown, Database, TestTube, GraduationCap, BookOpen, Sun, Moon, Laptop, BarChart2, FlaskConical, CheckCircle2, Users, Layers, Settings as SettingsIcon, Clock } from "lucide-react"
 import { useTheme } from "next-themes"
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -66,66 +66,73 @@ const navigationData = [
 ]
 
 const docsSubItems = [
-      { title: "Documentation", url: "/dashboard/knowledgehub/documentation" },
-      { title: "Best Practices", url: "/dashboard/knowledgehub/best-practices" },
-      { title: "Tutorials", url: "/dashboard/knowledgehub/tutorials" },
-      { title: "API Reference", url: "/dashboard/knowledgehub/api" },
-      { title: "Community", url: "/dashboard/knowledgehub/community" },
+  { title: "Documentation", url: "/dashboard/knowledgehub/documentation" },
+  { title: "Best Practices", url: "/dashboard/knowledgehub/best-practices" },
+  { title: "Tutorials", url: "/dashboard/knowledgehub/tutorials" },
+  { title: "API Reference", url: "/dashboard/knowledgehub/api" },
+  { title: "Community", url: "/dashboard/knowledgehub/community" },
 ];
 
 const dataSubItems = [
-  { title: "Upload", url: "/dashboard/data#overview" },
-  { title: "Meta Data", url: "/dashboard/data#cleaning" },
-  { title: "Preview", url: "/dashboard/data#preview" },
-  { title: "Actions", url: "/dashboard/data#export" },
+  { title: "Data Upload", url: "/dashboard/data#overview" },
+  { title: "Data Cleaning", url: "/dashboard/data#cleaning" },
+  { title: "Data Preview", url: "/dashboard/data#preview" },
+  { title: "Data Actions", url: "/dashboard/data#export" },
 ];
 
 // Add EDA subsections for the sidebar
 const edaSubItems = [
-  { title: "Overview", url: "/dashboard/eda#overview" },
-  { title: "Summary Stats", url: "/dashboard/eda#summary" },
-  { title: "Visualizations", url: "/dashboard/eda#visualizations" },
-  { title: "Correlations", url: "/dashboard/eda#correlations" },
-  { title: "Outliers", url: "/dashboard/eda#outliers" },
-  { title: "Insights", url: "/dashboard/eda#insights" },
-  { title: "Export", url: "/dashboard/eda#export" },
+  { title: "Data Overview", url: "/dashboard/eda#overview" },
+  { title: "Summary Statistics", url: "/dashboard/eda#summary" },
+  { title: "Data Visualizations", url: "/dashboard/eda#visualizations" },
+  { title: "Correlation Analysis", url: "/dashboard/eda#correlations" },
+  { title: "Outlier Detection", url: "/dashboard/eda#outliers" },
+  { title: "AI Insights", url: "/dashboard/eda#insights" },
+  { title: "Export Report", url: "/dashboard/eda#export" },
 ];
 
 const modellabSubItems = [
-  { title: "Dataset Summary", url: "/dashboard/modellab#select-dataset" },
-  { title: "Configure Model", url: "/dashboard/modellab#configure-model" },
-  { title: "Experiments", url: "/dashboard/modellab#experiments" },
-  { title: "Results & Analysis", url: "/dashboard/modellab#results" },
-  { title: "Export & Deployment", url: "/dashboard/modellab#export" },
+  { title: "Dataset Selection", url: "/dashboard/modellab#select-dataset" },
+  { title: "Model Configuration", url: "/dashboard/modellab#configure-model" },
+  { title: "Training Experiments", url: "/dashboard/modellab#experiments" },
+  { title: "Results Analysis", url: "/dashboard/modellab#results" },
+  { title: "Model Deployment", url: "/dashboard/modellab#export" },
 ];
 
 const testingSubItems = [
   { title: "Model Selection", url: "/dashboard/testing#model-selection" },
   { title: "Test Data Upload", url: "/dashboard/testing#file-upload" },
   { title: "Prediction Results", url: "/dashboard/testing#predictions" },
-  { title: "Confusion Matrix", url: "/dashboard/testing#confusion-matrix" },
+  { title: "Performance Metrics", url: "/dashboard/testing#confusion-matrix" },
+];
+
+const historySubItems = [
+  { title: "Activity Overview", url: "/dashboard/history#overview" },
+  { title: "Search & Filters", url: "/dashboard/history#filters" },
+  { title: "Activity List", url: "/dashboard/history#activity-list" },
+  { title: "Export Data", url: "/dashboard/history#export" },
 ];
 
 const mainNav = [
-  { title: "Data", icon: Database, subItems: dataSubItems },
-  { title: "EDA", url: "/dashboard/eda", icon: BarChart2, subItems: edaSubItems },
-  { title: "ModelLab", url: "/dashboard/modellab", icon: FlaskConical, subItems: modellabSubItems },
-  { title: "Testing", url: "/dashboard/testing", icon: CheckCircle2, subItems: testingSubItems },
-  { title: "Collaboration", url: "/dashboard/collaboration", icon: Users },
-  { title: "Docs", icon: BookOpen, subItems: docsSubItems },
-  { title: "History", url: "/dashboard/history", icon: Layers },
+  { title: "Data Management", icon: Database, subItems: dataSubItems },
+  { title: "Exploratory Analysis", url: "/dashboard/eda", icon: BarChart2, subItems: edaSubItems },
+  { title: "Model Laboratory", url: "/dashboard/modellab", icon: FlaskConical, subItems: modellabSubItems },
+  { title: "Model Testing", url: "/dashboard/testing", icon: CheckCircle2, subItems: testingSubItems },
+  { title: "Team Collaboration", url: "/dashboard/collaboration", icon: Users },
+  { title: "Documentation", icon: BookOpen, subItems: docsSubItems },
+  { title: "Activity History", url: "/dashboard/history", icon: Clock, subItems: historySubItems },
   // KnowledgeHub and Settings removed from this group
 ];
 
 // Helper: map sidebar item title to main page href
 const mainNavHref = {
-  Data: '/dashboard/data',
-  Docs: '/dashboard/knowledgehub/documentation',
-  EDA: '/dashboard/eda',
-  ModelLab: '/dashboard/modellab',
-  Testing: '/dashboard/testing',
-  Collaboration: '/dashboard/collaboration',
-  History: '/dashboard/history',
+  "Data Management": '/dashboard/data',
+  "Documentation": '/dashboard/knowledgehub/documentation',
+  "Exploratory Analysis": '/dashboard/eda',
+  "Model Laboratory": '/dashboard/modellab',
+  "Model Testing": '/dashboard/testing',
+  "Team Collaboration": '/dashboard/collaboration',
+  "Activity History": '/dashboard/history',
 };
 
 // Add EDA section IDs for scroll tracking
@@ -154,6 +161,13 @@ const testingSectionIds = [
   'confusion-matrix',
 ];
 
+const historySectionIds = [
+  'overview',
+  'filters',
+  'activity-list',
+  'export',
+];
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { setTheme, theme } = useTheme();
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
@@ -163,11 +177,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [dataOpen, setDataOpen] = useState(false);
   const [docsOpen, setDocsOpen] = useState(false); // Added state for Docs submenu
   const [testingOpen, setTestingOpen] = useState(pathname.startsWith('/dashboard/testing')); // Added state for Testing submenu
+  const [historyOpen, setHistoryOpen] = useState(pathname.startsWith('/dashboard/history')); // Added state for History submenu
   const [docsActiveHash, setDocsActiveHash] = useState('');
   // Add EDA section IDs for scroll tracking
   const [activeEdaSection, setActiveEdaSection] = useState('overview');
   const [activeModelLabSection, setActiveModelLabSection] = useState('select-dataset');
   const [activeTestingSection, setActiveTestingSection] = useState('model-selection');
+  const [activeHistorySection, setActiveHistorySection] = useState('overview');
 
   // Track hash for Docs section
   useEffect(() => {
@@ -280,6 +296,31 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [pathname]);
 
+  // Scroll tracking for History
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!pathname.startsWith('/dashboard/history')) return;
+    const handleScroll = () => {
+      let current = historySectionIds[0];
+      for (const id of historySectionIds) {
+        const el = document.getElementById(id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= 80) {
+            current = id;
+          }
+        }
+      }
+      if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 2)) {
+        current = historySectionIds[historySectionIds.length - 1];
+      }
+      setActiveHistorySection(current);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [pathname]);
+
   // Update testingOpen when pathname changes
   useEffect(() => {
     setTestingOpen(pathname.startsWith('/dashboard/testing'));
@@ -305,18 +346,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 item.subItems ? (
                   <Collapsible key={item.title}
                     open={
-                      item.title === 'Data' ? dataOpen :
-                      item.title === 'Docs' ? docsOpen :
-                      item.title === 'Testing' ? testingOpen :
+                      item.title === 'Data Management' ? dataOpen :
+                      item.title === 'Documentation' ? docsOpen :
+                      item.title === 'Model Testing' ? testingOpen :
+                      item.title === 'Activity History' ? historyOpen :
                       undefined
                     }
                     onOpenChange={
-                      item.title === 'Data' ? setDataOpen :
-                      item.title === 'Docs' ? setDocsOpen :
-                      item.title === 'Testing' ? setTestingOpen :
+                      item.title === 'Data Management' ? setDataOpen :
+                      item.title === 'Documentation' ? setDocsOpen :
+                      item.title === 'Model Testing' ? setTestingOpen :
+                      item.title === 'Activity History' ? setHistoryOpen :
                       undefined
                     }
-                    defaultOpen={item.title === 'Testing' ? pathname.startsWith('/dashboard/testing') : false}
+                    defaultOpen={item.title === 'Model Testing' ? pathname.startsWith('/dashboard/testing') : 
+                                 item.title === 'Activity History' ? pathname.startsWith('/dashboard/history') : false}
                     className="group/collapsible mt-2"
                   >
                     <SidebarMenuItem>
@@ -326,43 +370,43 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           className="flex-1"
                           onClick={() => {
                             // For sections with submenus, set to first subsection; for others, set to section name
-                            if (item.title === 'Data') setManualActiveSection('overview');
-                            else if (item.title === 'Docs') setManualActiveSection('documentation');
-                            else if (item.title === 'EDA') setManualActiveSection('eda');
-                            else if (item.title === 'ModelLab') setManualActiveSection('modellab');
-                            else if (item.title === 'Testing') setManualActiveSection('testing');
-                            else if (item.title === 'Collaboration') setManualActiveSection('collaboration');
-                            else if (item.title === 'History') setManualActiveSection('history');
+                            if (item.title === 'Data Management') setManualActiveSection('overview');
+                            else if (item.title === 'Documentation') setManualActiveSection('documentation');
+                            else if (item.title === 'Exploratory Analysis') setManualActiveSection('eda');
+                            else if (item.title === 'Model Laboratory') setManualActiveSection('modellab');
+                            else if (item.title === 'Model Testing') setManualActiveSection('testing');
+                            else if (item.title === 'Team Collaboration') setManualActiveSection('collaboration');
+                            else if (item.title === 'Activity History') setManualActiveSection('history');
                           }}
                         >
                           <SidebarMenuButton
                             className={[
                               'w-full text-[1rem] font-semibold tracking-tight flex items-center gap-2 relative transition-colors',
-                              (item.title === 'Data' && pathname === '/dashboard/data' && !dataOpen && ['overview', 'cleaning', 'preview', 'export'].includes(activeSection)) ? 'bg-primary/10 text-primary' :
-                              (item.title === 'EDA' && pathname.startsWith('/dashboard/eda')) ? 'bg-primary/10 text-primary' :
-                              (item.title === 'ModelLab' && pathname.startsWith('/dashboard/modellab')) ? 'bg-primary/10 text-primary' :
-                              (item.title === 'Testing' && pathname.startsWith('/dashboard/testing')) ? 'bg-primary/10 text-primary' :
-                              (item.title === 'Collaboration' && pathname.startsWith('/dashboard/collaboration')) ? 'bg-primary/10 text-primary' :
-                              (item.title === 'Docs' && pathname.startsWith('/dashboard/knowledgehub')) ? 'bg-primary/10 text-primary' :
-                              (item.title === 'History' && pathname.startsWith('/dashboard/history')) ? 'bg-primary/10 text-primary' :
+                              (item.title === 'Data Management' && pathname === '/dashboard/data' && !dataOpen && ['overview', 'cleaning', 'preview', 'export'].includes(activeSection)) ? 'bg-primary/10 text-primary' :
+                              (item.title === 'Exploratory Analysis' && pathname.startsWith('/dashboard/eda')) ? 'bg-primary/10 text-primary' :
+                              (item.title === 'Model Laboratory' && pathname.startsWith('/dashboard/modellab')) ? 'bg-primary/10 text-primary' :
+                              (item.title === 'Model Testing' && pathname.startsWith('/dashboard/testing')) ? 'bg-primary/10 text-primary' :
+                              (item.title === 'Team Collaboration' && pathname.startsWith('/dashboard/collaboration')) ? 'bg-primary/10 text-primary' :
+                              (item.title === 'Documentation' && pathname.startsWith('/dashboard/knowledgehub')) ? 'bg-primary/10 text-primary' :
+                              (item.title === 'Activity History' && pathname.startsWith('/dashboard/history')) ? 'bg-primary/10 text-primary' :
                               ''
                             ].join(' ')}
                           >
                             {/* Show indicator if Data is closed and any of its subsections is active */}
-                            {item.title === 'Data' &&
+                            {item.title === 'Data Management' &&
                               pathname === '/dashboard/data' &&
                               !dataOpen &&
                               ['overview', 'cleaning', 'preview', 'export'].includes(activeSection) && (
                               <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1.5 rounded-full bg-primary shadow-lg transition-all duration-300" />
                             )}
                             {/* Show indicator for other main sections */}
-                            {item.title !== 'Data' && (
-                              ((item.title === 'EDA' && pathname.startsWith('/dashboard/eda')) ||
-                               (item.title === 'ModelLab' && pathname.startsWith('/dashboard/modellab')) ||
-                               (item.title === 'Testing' && pathname.startsWith('/dashboard/testing')) ||
-                               (item.title === 'Collaboration' && pathname.startsWith('/dashboard/collaboration')) ||
-                               (item.title === 'Docs' && pathname.startsWith('/dashboard/knowledgehub')) ||
-                               (item.title === 'History' && pathname.startsWith('/dashboard/history'))
+                            {item.title !== 'Data Management' && (
+                              ((item.title === 'Exploratory Analysis' && pathname.startsWith('/dashboard/eda')) ||
+                               (item.title === 'Model Laboratory' && pathname.startsWith('/dashboard/modellab')) ||
+                               (item.title === 'Model Testing' && pathname.startsWith('/dashboard/testing')) ||
+                               (item.title === 'Team Collaboration' && pathname.startsWith('/dashboard/collaboration')) ||
+                               (item.title === 'Documentation' && pathname.startsWith('/dashboard/knowledgehub')) ||
+                               (item.title === 'Activity History' && pathname.startsWith('/dashboard/history'))
                               ) && (
                                 <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1.5 rounded-full bg-primary shadow-lg transition-all duration-300" />
                               )
@@ -382,17 +426,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             {item.subItems.map((subItem) => {
                               const hash = subItem.url.split('#')[1] || '';
                               let isActive = false;
-                              if (item.title === 'Data') {
+                              if (item.title === 'Data Management') {
                                 isActive = pathname === '/dashboard/data' && ((hoveredSection && hoveredSection === hash) || (!hoveredSection && (manualActiveSection ? manualActiveSection === hash : activeSection === hash)));
-                              } else if (item.title === 'EDA') {
+                              } else if (item.title === 'Exploratory Analysis') {
                                 isActive = pathname === '/dashboard/eda' && ((hoveredSection && hoveredSection === hash) || (!hoveredSection && (manualActiveSection ? manualActiveSection === hash : activeEdaSection === hash)));
-                              } else if (item.title === 'Docs') {
+                              } else if (item.title === 'Documentation') {
                                 isActive = pathname.startsWith('/dashboard/knowledgehub') && ((hoveredSection && hoveredSection === hash) || (!hoveredSection && (manualActiveSection ? manualActiveSection === hash : docsActiveHash === hash)));
-                              } else if (item.title === 'ModelLab') {
+                              } else if (item.title === 'Model Laboratory') {
                                 isActive = pathname === '/dashboard/modellab' && ((hoveredSection && hoveredSection === hash) || (!hoveredSection && (manualActiveSection ? manualActiveSection === hash : activeModelLabSection === hash)));
-                              } else if (item.title === 'Testing') {
-                                isActive = pathname === '/dashboard/testing' && ((hoveredSection && hoveredSection === hash) || (!hoveredSection && (manualActiveSection ? manualActiveSection === hash : activeTestingSection === hash)));
-                              }
+                                                             } else if (item.title === 'Model Testing') {
+                                 isActive = pathname === '/dashboard/testing' && ((hoveredSection && hoveredSection === hash) || (!hoveredSection && (manualActiveSection ? manualActiveSection === hash : activeTestingSection === hash)));
+                               } else if (item.title === 'Activity History') {
+                                 isActive = pathname === '/dashboard/history' && ((hoveredSection && hoveredSection === hash) || (!hoveredSection && (manualActiveSection ? manualActiveSection === hash : activeHistorySection === hash)));
+                               }
                               return (
                                 <SidebarMenuSubItem key={subItem.title}>
                                   <SidebarMenuSubButton asChild>
