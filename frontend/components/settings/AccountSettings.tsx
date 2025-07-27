@@ -15,6 +15,7 @@ export default function AccountSettings() {
   const [avatarUrl, setAvatarUrl] = useState(user?.avatarUrl || "");
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Connected accounts (OAuth)
@@ -32,18 +33,31 @@ export default function AccountSettings() {
   };
 
   const handleSave = async () => {
-    // In a real app, call backend API to update user info
     if (!name || !email) {
       setError("Name and email are required.");
       return;
     }
-    setUser({ ...user, name, email, avatarUrl });
-    setSuccess("Profile updated!");
-    setTimeout(() => setSuccess(""), 2000);
-    setEditMode(false);
-    // If email changed, sign out to re-authenticate
-    if (email !== user?.email) {
-      setTimeout(() => signOut({ callbackUrl: "/" }), 1200);
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/users/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, avatarUrl }),
+      });
+      if (!res.ok) throw new Error("Failed to update profile");
+      const updatedUser = await res.json();
+      setUser(updatedUser); // Optionally update context/state here
+      setSuccess("Profile updated!");
+      setEditMode(false);
+      // If email changed, sign out to re-authenticate
+      if (email !== user?.email) {
+        setTimeout(() => signOut({ callbackUrl: "/" }), 1200);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -60,7 +74,7 @@ export default function AccountSettings() {
               {avatarUrl ? (
                 <AvatarImage src={avatarUrl} alt={name || email} />
               ) : (
-                <AvatarFallback>{name ? name[0].toUpperCase() : email[0].toUpperCase()}</AvatarFallback>
+                <AvatarFallback>{(name && name[0]) ? name[0].toUpperCase() : (email && email[0]) ? email[0].toUpperCase() : "?"}</AvatarFallback>
               )}
             </Avatar>
             {editMode ? (
@@ -95,8 +109,8 @@ export default function AccountSettings() {
           <div className="mt-2 flex gap-2">
             {editMode ? (
               <>
-                <Button onClick={handleSave}>Save</Button>
-                <Button variant="outline" onClick={() => setEditMode(false)}>Cancel</Button>
+                <Button onClick={handleSave} disabled={loading}>{loading ? "Saving..." : "Save"}</Button>
+                <Button variant="outline" onClick={() => setEditMode(false)} disabled={loading}>Cancel</Button>
               </>
             ) : (
               <Button onClick={() => setEditMode(true)}>Edit Profile</Button>

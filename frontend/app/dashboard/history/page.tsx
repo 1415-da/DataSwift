@@ -11,6 +11,7 @@ import { Calendar, Search, Filter, Download, Eye, Clock, Activity, Database, Fla
 interface HistoryItem {
   _id: string;
   userId: string;
+  userName: string; // Add real user name
   actionType: string;
   context: string;
   timestamp: string;
@@ -38,7 +39,7 @@ export default function HistoryPage() {
       setError(null);
       try {
         console.log('Fetching activities from API...');
-        const response = await fetch('/api/activities?populate=true');
+        const response = await fetch('/api/activities');
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -79,6 +80,7 @@ export default function HistoryPage() {
       filtered = filtered.filter(item =>
         item.actionType.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.context.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.userId.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
@@ -219,7 +221,7 @@ export default function HistoryPage() {
     const csv = [
       'Type,Title,Description,Status,User,Timestamp,Details',
       ...filteredHistory.map(item => 
-        `${getTypeLabel(item.actionType)},"${item.context}","${item.context}",${item.details?.status || 'unknown'},${item.userId},"${item.timestamp}","${JSON.stringify(item.details)}"`
+        `${getTypeLabel(item.actionType)},"${item.context}","${item.context}",${item.details?.status || 'unknown'},${item.userName},"${item.timestamp}","${JSON.stringify(item.details)}"`
       )
     ].join('\n');
 
@@ -295,7 +297,7 @@ export default function HistoryPage() {
               <div>
                 <p className="text-sm text-muted-foreground">Completed</p>
                 <p className="text-2xl font-bold text-green-600">
-                  {history.filter(item => item.actionType === 'completed').length}
+                  {history.filter(item => item.details?.status === 'completed').length}
                 </p>
               </div>
               <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -310,7 +312,7 @@ export default function HistoryPage() {
               <div>
                 <p className="text-sm text-muted-foreground">In Progress</p>
                 <p className="text-2xl font-bold text-blue-600">
-                  {history.filter(item => item.actionType === 'in_progress').length}
+                  {history.filter(item => item.details?.status === 'in_progress').length}
                 </p>
               </div>
               <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -325,7 +327,7 @@ export default function HistoryPage() {
               <div>
                 <p className="text-sm text-muted-foreground">Failed</p>
                 <p className="text-2xl font-bold text-red-600">
-                  {history.filter(item => item.actionType === 'failed').length}
+                  {history.filter(item => item.details?.status === 'failed').length}
                 </p>
               </div>
               <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
@@ -429,7 +431,7 @@ export default function HistoryPage() {
                       <div className="flex items-center gap-4 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Users className="w-4 h-4" />
-                          {item.userId}
+                          {item.userName}
                         </span>
                         <span className="flex items-center gap-1">
                           <Clock className="w-4 h-4" />

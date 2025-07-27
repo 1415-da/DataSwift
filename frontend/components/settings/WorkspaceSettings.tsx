@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button, Input } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const mockWorkspaces = [
   { id: 1, name: "Acme Inc.", description: "Main workspace", logo: "" },
@@ -68,7 +69,7 @@ export default function WorkspaceSettings() {
           <label className="block font-medium mb-1 mt-2">Description</label>
           <Input value={description} onChange={e => setDescription(e.target.value)} />
           <label className="block font-medium mb-1 mt-2">Logo</label>
-          <Input type="file" accept="image/*" onChange={e => setLogo(e.target.value)} />
+          <Input type="file" accept="image/*" onChange={e => setLogo(e.target.value)} className="file:!bg-primary/10 file:!text-primary file:!border-primary/50 file:!ring-2 file:!ring-primary/30" />
           <Button className="mt-2" onClick={handleSaveWorkspace}>Save Workspace</Button>
         </div>
         {/* Switch workspace */}

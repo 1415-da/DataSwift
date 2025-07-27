@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
 
 export default function NotificationsSettings() {
+  const { user } = useAuth();
   const [emailNotif, setEmailNotif] = useState(true);
   const [pushNotif, setPushNotif] = useState(false);
   const [inAppNotif, setInAppNotif] = useState(true);
@@ -13,10 +15,39 @@ export default function NotificationsSettings() {
   const [timezone, setTimezone] = useState("UTC");
   const [darkMode, setDarkMode] = useState(false);
   const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSave = () => {
-    setSuccess("Preferences updated!");
-    setTimeout(() => setSuccess(""), 2000);
+  const handleSave = async () => {
+    setLoading(true);
+    setError("");
+    setSuccess("");
+    try {
+      const res = await fetch("/api/users", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: user?.email,
+          notificationPreferences: {
+            emailNotif,
+            pushNotif,
+            inAppNotif,
+            productUpdates,
+            securityAlerts,
+            activitySummaries,
+            language,
+            timezone,
+            darkMode,
+          },
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to update notification preferences");
+      setSuccess("Preferences updated!");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -88,7 +119,10 @@ export default function NotificationsSettings() {
             <input id="darkmode" type="checkbox" checked={darkMode} onChange={e => setDarkMode(e.target.checked)} aria-label="Dark Mode" />
           </div>
         </section>
-        <Button className="mt-4" onClick={handleSave} aria-label="Save Preferences">Save Preferences</Button>
+        <Button className="mt-4" onClick={handleSave} aria-label="Save Preferences" disabled={loading}>
+          {loading ? "Saving..." : "Save Preferences"}
+        </Button>
+        {error && <div className="text-destructive text-sm mt-2" role="alert">{error}</div>}
         {success && <div className="text-green-600 text-sm mt-2" role="status">{success}</div>}
       </CardContent>
     </Card>

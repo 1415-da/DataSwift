@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
 
 const mockTokens = [
   { id: 1, name: "API Token 1", lastUsed: "2024-06-01" },
@@ -10,35 +11,79 @@ const mockDevices = [
 ];
 
 export default function PrivacySecuritySettings() {
+  const { user } = useAuth();
   const [tokens, setTokens] = useState(mockTokens);
   const [devices, setDevices] = useState(mockDevices);
   const [privacy, setPrivacy] = useState(true);
   const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [confirmToken, setConfirmToken] = useState<number|null>(null);
   const [confirmDevice, setConfirmDevice] = useState<number|null>(null);
 
   const handleRevokeToken = (id: number) => {
     setConfirmToken(id);
   };
-  const confirmRevokeToken = () => {
-    setTokens(tokens.filter(t => t.id !== confirmToken));
-    setSuccess("Token revoked.");
-    setTimeout(() => setSuccess(""), 2000);
-    setConfirmToken(null);
+  const confirmRevokeToken = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const newTokens = tokens.filter(t => t.id !== confirmToken);
+      const res = await fetch("/api/users", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user?.email, tokens: newTokens }),
+      });
+      if (!res.ok) throw new Error("Failed to revoke token");
+      setTokens(newTokens);
+      setSuccess("Token revoked.");
+      setConfirmToken(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
   const handleRemoveDevice = (id: number) => {
     setConfirmDevice(id);
   };
-  const confirmRemoveDevice = () => {
-    setDevices(devices.filter(d => d.id !== confirmDevice));
-    setSuccess("Device removed.");
-    setTimeout(() => setSuccess(""), 2000);
-    setConfirmDevice(null);
+  const confirmRemoveDevice = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const newDevices = devices.filter(d => d.id !== confirmDevice);
+      const res = await fetch("/api/users", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user?.email, devices: newDevices }),
+      });
+      if (!res.ok) throw new Error("Failed to remove device");
+      setDevices(newDevices);
+      setSuccess("Device removed.");
+      setConfirmDevice(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
-  const handlePrivacy = () => {
-    setPrivacy(!privacy);
-    setSuccess("Privacy preferences updated!");
-    setTimeout(() => setSuccess(""), 2000);
+  const handlePrivacy = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/users", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user?.email, privacy }),
+      });
+      if (!res.ok) throw new Error("Failed to update privacy preferences");
+      setPrivacy(!privacy);
+      setSuccess("Privacy preferences updated!");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -65,8 +110,8 @@ export default function PrivacySecuritySettings() {
           {confirmToken !== null && (
             <div className="bg-destructive/10 p-4 rounded mt-2">
               <div className="mb-2">Are you sure you want to revoke this token?</div>
-              <Button variant="destructive" onClick={confirmRevokeToken}>Yes, Revoke</Button>
-              <Button variant="outline" className="ml-2" onClick={() => setConfirmToken(null)}>Cancel</Button>
+              <Button variant="destructive" onClick={confirmRevokeToken} disabled={loading}>Yes, Revoke</Button>
+              <Button variant="outline" className="ml-2" onClick={() => setConfirmToken(null)} disabled={loading}>Cancel</Button>
             </div>
           )}
         </section>
@@ -81,7 +126,7 @@ export default function PrivacySecuritySettings() {
             Data Privacy Preferences <span title="Control how your data is used." className="text-xs cursor-help">?</span>
           </h2>
           <label className="flex items-center gap-2">
-            <input type="checkbox" checked={privacy} onChange={handlePrivacy} aria-label="Allow data processing for analytics" />
+            <input type="checkbox" checked={privacy} onChange={handlePrivacy} aria-label="Allow data processing for analytics" disabled={loading} />
             Allow data processing for analytics
           </label>
         </section>
@@ -106,12 +151,13 @@ export default function PrivacySecuritySettings() {
           {confirmDevice !== null && (
             <div className="bg-destructive/10 p-4 rounded mt-2">
               <div className="mb-2">Are you sure you want to remove this device?</div>
-              <Button variant="destructive" onClick={confirmRemoveDevice}>Yes, Remove</Button>
-              <Button variant="outline" className="ml-2" onClick={() => setConfirmDevice(null)}>Cancel</Button>
+              <Button variant="destructive" onClick={confirmRemoveDevice} disabled={loading}>Yes, Remove</Button>
+              <Button variant="outline" className="ml-2" onClick={() => setConfirmDevice(null)} disabled={loading}>Cancel</Button>
             </div>
           )}
         </section>
         {success && <div className="text-green-600 text-sm mt-2" role="status">{success}</div>}
+        {error && <div className="text-destructive text-sm mt-2" role="alert">{error}</div>}
       </CardContent>
     </Card>
   );
