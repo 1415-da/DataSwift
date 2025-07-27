@@ -162,6 +162,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [hoveredSection, setHoveredSection] = useState<string | null>(null);
   const [dataOpen, setDataOpen] = useState(false);
   const [docsOpen, setDocsOpen] = useState(false); // Added state for Docs submenu
+  const [testingOpen, setTestingOpen] = useState(pathname.startsWith('/dashboard/testing')); // Added state for Testing submenu
   const [docsActiveHash, setDocsActiveHash] = useState('');
   // Add EDA section IDs for scroll tracking
   const [activeEdaSection, setActiveEdaSection] = useState('overview');
@@ -279,6 +280,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [pathname]);
 
+  // Update testingOpen when pathname changes
+  useEffect(() => {
+    setTestingOpen(pathname.startsWith('/dashboard/testing'));
+  }, [pathname]);
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -301,15 +307,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     open={
                       item.title === 'Data' ? dataOpen :
                       item.title === 'Docs' ? docsOpen :
-                      item.title === 'Testing' ? true :
+                      item.title === 'Testing' ? testingOpen :
                       undefined
                     }
                     onOpenChange={
                       item.title === 'Data' ? setDataOpen :
                       item.title === 'Docs' ? setDocsOpen :
+                      item.title === 'Testing' ? setTestingOpen :
                       undefined
                     }
-                    defaultOpen={item.title === 'Testing' ? true : false}
+                    defaultOpen={item.title === 'Testing' ? pathname.startsWith('/dashboard/testing') : false}
                     className="group/collapsible mt-2"
                   >
                     <SidebarMenuItem>

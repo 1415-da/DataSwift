@@ -183,6 +183,7 @@ export default function TestingPage() {
       const response = await fetch('/api/predict/predict', {
         method: 'POST',
         body: formData,
+        // Don't set Content-Type header - let browser set it with boundary for FormData
       });
 
       console.log('Response status:', response.status);
@@ -545,9 +546,14 @@ export default function TestingPage() {
                   {predictions.slice(0, 10).map((pred, index) => (
                     <tr key={index} className="hover:bg-muted/50">
                       <td className="px-4 py-2 border-b">
-                        <div className="text-sm">
+                        <div className="space-y-1">
                           {Object.entries(pred.input).map(([key, value]) => (
-                            <div key={key}>{key}: {String(value)}</div>
+                            <div key={key} className="flex items-center justify-between text-sm">
+                              <span className="font-medium text-muted-foreground min-w-[80px]">{key}:</span>
+                              <span className="font-semibold text-foreground ml-2">
+                                {typeof value === 'number' ? value.toFixed(3) : String(value)}
+                              </span>
+                            </div>
                           ))}
                         </div>
                       </td>
@@ -574,117 +580,100 @@ export default function TestingPage() {
       )}
 
       {/* Confusion Matrix */}
-      {predictions && predictions.length > 0 && (
+      {predictions && predictions.length > 0 && confusionMatrix && (
         <TestingCard title={<span id="confusion-matrix" className="text-3xl font-extrabold">Confusion Matrix & Metrics</span>}>
-          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-800">
-              <strong>Note:</strong> Confusion Matrix is only generated for classification models. 
-              For regression models, this section will not display any metrics.
-            </p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Confusion Matrix Visualization */}
+            <div>
+              <h3 className="font-semibold mb-4">Confusion Matrix</h3>
+              <div className="grid grid-cols-2 gap-2 max-w-xs mx-auto">
+                <div className="p-4 bg-green-100 text-green-800 text-center rounded-lg">
+                  <div className="text-2xl font-bold">{confusionMatrix?.true_positives || 0}</div>
+                  <div className="text-sm">True Positives</div>
+                </div>
+                <div className="p-4 bg-red-100 text-red-800 text-center rounded-lg">
+                  <div className="text-2xl font-bold">{confusionMatrix?.false_positives || 0}</div>
+                  <div className="text-sm">False Positives</div>
+                </div>
+                <div className="p-4 bg-red-100 text-red-800 text-center rounded-lg">
+                  <div className="text-2xl font-bold">{confusionMatrix?.false_negatives || 0}</div>
+                  <div className="text-sm">False Negatives</div>
+                </div>
+                <div className="p-4 bg-green-100 text-green-800 text-center rounded-lg">
+                  <div className="text-2xl font-bold">{confusionMatrix?.true_negatives || 0}</div>
+                  <div className="text-sm">True Negatives</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Metrics */}
+            <div>
+              <h3 className="font-semibold mb-4">Performance Metrics</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
+                  <span className="font-medium">Accuracy</span>
+                  <span className="font-bold text-lg">{((confusionMatrix?.accuracy || 0) * 100).toFixed(1)}%</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
+                  <span className="font-medium">Precision</span>
+                  <span className="font-bold text-lg">{((confusionMatrix?.precision || 0) * 100).toFixed(1)}%</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
+                  <span className="font-medium">Recall</span>
+                  <span className="font-bold text-lg">{((confusionMatrix?.recall || 0) * 100).toFixed(1)}%</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
+                  <span className="font-medium">F1 Score</span>
+                  <span className="font-bold text-lg">{((confusionMatrix?.f1_score || 0) * 100).toFixed(1)}%</span>
+                </div>
+              </div>
+            </div>
           </div>
-          {confusionMatrix ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Confusion Matrix Visualization */}
-              <div>
-                <h3 className="font-semibold mb-4">Confusion Matrix</h3>
-                <div className="grid grid-cols-2 gap-2 max-w-xs mx-auto">
-                  <div className="p-4 bg-green-100 text-green-800 text-center rounded-lg">
-                    <div className="text-2xl font-bold">{confusionMatrix?.true_positives || 0}</div>
-                    <div className="text-sm">True Positives</div>
-                  </div>
-                  <div className="p-4 bg-red-100 text-red-800 text-center rounded-lg">
-                    <div className="text-2xl font-bold">{confusionMatrix?.false_positives || 0}</div>
-                    <div className="text-sm">False Positives</div>
-                  </div>
-                  <div className="p-4 bg-red-100 text-red-800 text-center rounded-lg">
-                    <div className="text-2xl font-bold">{confusionMatrix?.false_negatives || 0}</div>
-                    <div className="text-sm">False Negatives</div>
-                  </div>
-                  <div className="p-4 bg-green-100 text-green-800 text-center rounded-lg">
-                    <div className="text-2xl font-bold">{confusionMatrix?.true_negatives || 0}</div>
-                    <div className="text-sm">True Negatives</div>
-                  </div>
-                </div>
-              </div>
 
-              {/* Metrics */}
-              <div>
-                <h3 className="font-semibold mb-4">Performance Metrics</h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                    <span className="font-medium">Accuracy</span>
-                    <span className="font-bold text-lg">{((confusionMatrix?.accuracy || 0) * 100).toFixed(1)}%</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                    <span className="font-medium">Precision</span>
-                    <span className="font-bold text-lg">{((confusionMatrix?.precision || 0) * 100).toFixed(1)}%</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                    <span className="font-medium">Recall</span>
-                    <span className="font-bold text-lg">{((confusionMatrix?.recall || 0) * 100).toFixed(1)}%</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                    <span className="font-medium">F1 Score</span>
-                    <span className="font-bold text-lg">{((confusionMatrix?.f1_score || 0) * 100).toFixed(1)}%</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Confusion Matrix Chart */}
-            <div className="mt-8">
-              <h3 className="font-semibold mb-4">Confusion Matrix Chart</h3>
-              <div className="max-w-md mx-auto">
-                <Doughnut
-                  data={{
-                    labels: ['True Positives', 'False Positives', 'False Negatives', 'True Negatives'],
-                    datasets: [{
-                      data: [
-                        confusionMatrix?.true_positives || 0,
-                        confusionMatrix?.false_positives || 0,
-                        confusionMatrix?.false_negatives || 0,
-                        confusionMatrix?.true_negatives || 0
-                      ],
-                      backgroundColor: [
-                        'rgba(34, 197, 94, 0.8)',
-                        'rgba(239, 68, 68, 0.8)',
-                        'rgba(239, 68, 68, 0.8)',
-                        'rgba(34, 197, 94, 0.8)'
-                      ],
-                      borderColor: [
-                        'rgba(34, 197, 94, 1)',
-                        'rgba(239, 68, 68, 1)',
-                        'rgba(239, 68, 68, 1)',
-                        'rgba(34, 197, 94, 1)'
-                      ],
-                      borderWidth: 2
-                    }]
-                  }}
-                  options={{
-                    responsive: true,
-                    plugins: {
-                      legend: {
-                        position: 'bottom'
-                      },
-                      title: {
-                        display: true,
-                        text: 'Confusion Matrix Distribution'
-                      }
+          {/* Confusion Matrix Chart */}
+          <div className="mt-8">
+            <h3 className="font-semibold mb-4">Confusion Matrix Chart</h3>
+            <div className="max-w-md mx-auto">
+              <Doughnut
+                data={{
+                  labels: ['True Positives', 'False Positives', 'False Negatives', 'True Negatives'],
+                  datasets: [{
+                    data: [
+                      confusionMatrix?.true_positives || 0,
+                      confusionMatrix?.false_positives || 0,
+                      confusionMatrix?.false_negatives || 0,
+                      confusionMatrix?.true_negatives || 0
+                    ],
+                    backgroundColor: [
+                      'rgba(34, 197, 94, 0.8)',
+                      'rgba(239, 68, 68, 0.8)',
+                      'rgba(239, 68, 68, 0.8)',
+                      'rgba(34, 197, 94, 0.8)'
+                    ],
+                    borderColor: [
+                      'rgba(34, 197, 94, 1)',
+                      'rgba(239, 68, 68, 1)',
+                      'rgba(239, 68, 68, 1)',
+                      'rgba(34, 197, 94, 1)'
+                    ],
+                    borderWidth: 2
+                  }]
+                }}
+                options={{
+                  responsive: true,
+                  plugins: {
+                    legend: {
+                      position: 'bottom'
+                    },
+                    title: {
+                      display: true,
+                      text: 'Confusion Matrix Distribution'
                     }
-                  }}
-                />
-              </div>
+                  }
+                }}
+              />
             </div>
-          ) : (
-            <div className="py-8 text-center">
-              <div className="text-muted-foreground">
-                <p className="text-lg mb-2">No Confusion Matrix Available</p>
-                <p className="text-sm">
-                  This model appears to be a regression model. Confusion matrices are only generated for classification models.
-                </p>
-              </div>
-            </div>
-          )}
+          </div>
         </TestingCard>
       )}
     </div>
