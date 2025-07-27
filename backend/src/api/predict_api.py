@@ -6,8 +6,19 @@ import json
 import pandas as pd
 import io
 import random
+import math
 
 router = APIRouter()
+
+def clean_nans(obj):
+    if isinstance(obj, float) and (math.isnan(obj) or math.isinf(obj)):
+        return None
+    elif isinstance(obj, dict):
+        return {k: clean_nans(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [clean_nans(x) for x in obj]
+    else:
+        return obj
 
 @router.post("/deploy")
 async def deploy_model(payload: Dict[str, Any]):
@@ -160,7 +171,7 @@ async def predict_with_file(file: UploadFile = File(...), model_id: str = Form(.
             "actual_values": actual_values
         }
 
-        return result
+        return clean_nans(result)
     except Exception as e:
         return {"success": False, "error": str(e)}
 

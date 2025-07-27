@@ -61,7 +61,7 @@ export default function NotificationsSettings() {
       <CardContent className="space-y-8">
         <section aria-labelledby="notif-types">
           <h2 id="notif-types" className="font-semibold mb-2 flex items-center gap-2">
-            Notification Types <span title="Choose which notifications you want to receive." className="text-xs cursor-help">?</span>
+            Notification Types
           </h2>
           <div className="flex flex-col gap-2">
             <label className="flex items-center gap-2">
@@ -92,7 +92,7 @@ export default function NotificationsSettings() {
         </section>
         <section aria-labelledby="prefs">
           <h2 id="prefs" className="font-semibold mb-2 flex items-center gap-2">
-            Preferences <span title="Set your language, timezone, and display options." className="text-xs cursor-help">?</span>
+            Preferences
           </h2>
           <div className="flex gap-4 mt-2 flex-wrap">
             <div>

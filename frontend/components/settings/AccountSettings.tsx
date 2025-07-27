@@ -16,6 +16,17 @@ export default function AccountSettings() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [password, setPassword] = useState("");
+  const [passwordSuccess, setPasswordSuccess] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [twoFAEnabled, setTwoFAEnabled] = useState(false);
+  const [twoFALoading, setTwoFALoading] = useState(false);
+  const [twoFAError, setTwoFAError] = useState("");
+  const [twoFASuccess, setTwoFASuccess] = useState("");
+  const [downloadLoading, setDownloadLoading] = useState(false);
+  const [downloadError, setDownloadError] = useState("");
+  const [downloadSuccess, setDownloadSuccess] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Connected accounts (OAuth)
@@ -40,10 +51,10 @@ export default function AccountSettings() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/users/update", {
-        method: "POST",
+      const res = await fetch("/api/users", {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, avatarUrl }),
+        body: JSON.stringify({ email, name, avatarUrl }),
       });
       if (!res.ok) throw new Error("Failed to update profile");
       const updatedUser = await res.json();
@@ -58,6 +69,70 @@ export default function AccountSettings() {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    setPasswordLoading(true);
+    setPasswordError("");
+    setPasswordSuccess("");
+    try {
+      const res = await fetch("/api/account/password", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user?.email, password }),
+      });
+      if (!res.ok) throw new Error("Failed to update password");
+      setPasswordSuccess("Password updated!");
+      setPassword("");
+    } catch (err) {
+      setPasswordError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
+  const handleToggle2FA = async () => {
+    setTwoFALoading(true);
+    setTwoFAError("");
+    setTwoFASuccess("");
+    try {
+      const res = await fetch("/api/account/2fa", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user?.email, enable: !twoFAEnabled }),
+      });
+      if (!res.ok) throw new Error("Failed to update 2FA");
+      setTwoFAEnabled(!twoFAEnabled);
+      setTwoFASuccess(twoFAEnabled ? "2FA disabled." : "2FA enabled!");
+    } catch (err) {
+      setTwoFAError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setTwoFALoading(false);
+    }
+  };
+
+  const handleDownloadAccountData = async () => {
+    setDownloadLoading(true);
+    setDownloadError("");
+    setDownloadSuccess("");
+    try {
+      const res = await fetch(`/api/account/export?email=${user?.email}`);
+      if (!res.ok) throw new Error("Failed to export account data");
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `account_data.zip`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      setDownloadSuccess("Account data downloaded!");
+    } catch (err) {
+      setDownloadError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setDownloadLoading(false);
     }
   };
 
@@ -119,16 +194,20 @@ export default function AccountSettings() {
           {success && <div className="text-green-600 text-sm mt-2">{success}</div>}
           {error && <div className="text-destructive text-sm mt-2">{error}</div>}
         </div>
-        {/* Change password (stub) */}
+        {/* Change password */}
         <div>
           <label className="block font-medium mb-1">Change Password</label>
-          <Input type="password" placeholder="New password" />
-          <Button className="mt-2" disabled>Update Password (stub)</Button>
+          <Input type="password" placeholder="New password" value={password} onChange={e => setPassword(e.target.value)} />
+          <Button className="mt-2" onClick={handlePasswordChange} disabled={passwordLoading || !password}>{passwordLoading ? "Updating..." : "Update Password"}</Button>
+          {passwordSuccess && <div className="text-green-600 text-sm mt-2">{passwordSuccess}</div>}
+          {passwordError && <div className="text-destructive text-sm mt-2">{passwordError}</div>}
         </div>
-        {/* Two-factor authentication (stub) */}
+        {/* Two-factor authentication */}
         <div>
           <label className="block font-medium mb-1">Two-Factor Authentication</label>
-          <Button variant="outline" disabled>Set Up 2FA (stub)</Button>
+          <Button variant="outline" onClick={handleToggle2FA} disabled={twoFALoading}>{twoFALoading ? (twoFAEnabled ? "Disabling..." : "Enabling...") : (twoFAEnabled ? "Disable 2FA" : "Enable 2FA")}</Button>
+          {twoFASuccess && <div className="text-green-600 text-sm mt-2">{twoFASuccess}</div>}
+          {twoFAError && <div className="text-destructive text-sm mt-2">{twoFAError}</div>}
         </div>
         {/* Connected accounts (OAuth) */}
         <div>
@@ -137,9 +216,11 @@ export default function AccountSettings() {
             <Button variant="outline" disabled>Manage OAuth/SSO (stub)</Button>
           </div>
         </div>
-        {/* Download account data (stub) */}
+        {/* Download account data */}
         <div>
-          <Button variant="outline" disabled>Download Account Data (stub)</Button>
+          <Button variant="outline" onClick={handleDownloadAccountData} disabled={downloadLoading}>{downloadLoading ? "Downloading..." : "Download Account Data"}</Button>
+          {downloadSuccess && <div className="text-green-600 text-sm mt-2">{downloadSuccess}</div>}
+          {downloadError && <div className="text-destructive text-sm mt-2">{downloadError}</div>}
         </div>
       </CardContent>
     </Card>

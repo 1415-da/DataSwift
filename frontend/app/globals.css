@@ -100,3 +100,8 @@
 .animate-indeterminate-bar {
   animation: indeterminate-bar 1.2s infinite linear;
 }
+
+/* Hide caret globally except in input, textarea, and contenteditable */
+body, *:not(input):not(textarea):not([contenteditable="true"]) {
+  caret-color: transparent !important;
+}

@@ -97,7 +97,7 @@ export default function PrivacySecuritySettings() {
       <CardContent className="space-y-8">
         <section aria-labelledby="tokens">
           <h2 id="tokens" className="font-semibold mb-2 flex items-center gap-2">
-            Access Tokens <span title="Revoke tokens to remove access." className="text-xs cursor-help">?</span>
+            Access Tokens
           </h2>
           <ul className="mb-2">
             {tokens.map(t => (
@@ -117,13 +117,13 @@ export default function PrivacySecuritySettings() {
         </section>
         <section aria-labelledby="sessions">
           <h2 id="sessions" className="font-semibold mb-2 flex items-center gap-2">
-            Active Sessions <span title="Revoke sessions to log out from other devices." className="text-xs cursor-help">?</span>
+            Active Sessions
           </h2>
           <Button variant="outline" disabled aria-label="Revoke Sessions">Revoke Sessions (stub)</Button>
         </section>
         <section aria-labelledby="privacy">
           <h2 id="privacy" className="font-semibold mb-2 flex items-center gap-2">
-            Data Privacy Preferences <span title="Control how your data is used." className="text-xs cursor-help">?</span>
+            Data Privacy Preferences
           </h2>
           <label className="flex items-center gap-2">
             <input type="checkbox" checked={privacy} onChange={handlePrivacy} aria-label="Allow data processing for analytics" disabled={loading} />
@@ -132,13 +132,13 @@ export default function PrivacySecuritySettings() {
         </section>
         <section aria-labelledby="security">
           <h2 id="security" className="font-semibold mb-2 flex items-center gap-2">
-            Security Settings <span title="Review your security settings." className="text-xs cursor-help">?</span>
+            Security Settings
           </h2>
           <Button variant="outline" disabled aria-label="Review Security Settings">Review (stub)</Button>
         </section>
         <section aria-labelledby="devices">
           <h2 id="devices" className="font-semibold mb-2 flex items-center gap-2">
-            Trusted Devices <span title="Remove devices you no longer use." className="text-xs cursor-help">?</span>
+            Trusted Devices
           </h2>
           <ul className="mb-2">
             {devices.map(d => (

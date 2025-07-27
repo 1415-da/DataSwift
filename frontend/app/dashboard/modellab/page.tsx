@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { toast } from '@/components/ui/use-toast';
 import dynamic from 'next/dynamic';
 import { Progress } from '@/components/ui/progress';
+import { useSearchParams } from 'next/navigation';
 
 // --- Types ---
 interface DatasetMeta {
@@ -830,6 +831,16 @@ Notes:
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
 
   const [copyClicked, setCopyClicked] = useState(false);
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const autoDeploy = searchParams?.get('deploy') === '1';
+  const [autoDeployed, setAutoDeployed] = useState(false);
+
+  useEffect(() => {
+    if (autoDeploy && !autoDeployed && latestCompletedExperiment) {
+      setAutoDeployed(true);
+      handleDeployExperiment(latestCompletedExperiment);
+    }
+  }, [autoDeploy, autoDeployed, latestCompletedExperiment]);
 
   if (!mounted) {
     // Skeleton loader for SSR

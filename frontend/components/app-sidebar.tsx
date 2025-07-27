@@ -174,10 +174,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [activeSection, setActiveSection] = useState('overview');
   const [manualActiveSection, setManualActiveSection] = useState<string | null>(null);
   const [hoveredSection, setHoveredSection] = useState<string | null>(null);
-  const [dataOpen, setDataOpen] = useState(false);
-  const [docsOpen, setDocsOpen] = useState(false); // Added state for Docs submenu
-  const [testingOpen, setTestingOpen] = useState(pathname.startsWith('/dashboard/testing')); // Added state for Testing submenu
-  const [historyOpen, setHistoryOpen] = useState(pathname.startsWith('/dashboard/history')); // Added state for History submenu
+  const [edaOpen, setEdaOpen] = useState(pathname.startsWith('/dashboard/eda'));
+  const [modellabOpen, setModellabOpen] = useState(pathname.startsWith('/dashboard/modellab'));
+  const [dataOpen, setDataOpen] = useState(pathname.startsWith('/dashboard/data'));
+  const [docsOpen, setDocsOpen] = useState(pathname.startsWith('/dashboard/knowledgehub'));
+  const [testingOpen, setTestingOpen] = useState(pathname.startsWith('/dashboard/testing'));
+  const [historyOpen, setHistoryOpen] = useState(pathname.startsWith('/dashboard/history'));
   const [docsActiveHash, setDocsActiveHash] = useState('');
   // Add EDA section IDs for scroll tracking
   const [activeEdaSection, setActiveEdaSection] = useState('overview');
@@ -326,6 +328,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     setTestingOpen(pathname.startsWith('/dashboard/testing'));
   }, [pathname]);
 
+  useEffect(() => { setEdaOpen(pathname.startsWith('/dashboard/eda')); }, [pathname]);
+  useEffect(() => { setModellabOpen(pathname.startsWith('/dashboard/modellab')); }, [pathname]);
+  useEffect(() => { setDataOpen(pathname.startsWith('/dashboard/data')); }, [pathname]);
+  useEffect(() => { setDocsOpen(pathname.startsWith('/dashboard/knowledgehub')); }, [pathname]);
+  useEffect(() => { setTestingOpen(pathname.startsWith('/dashboard/testing')); }, [pathname]);
+  useEffect(() => { setHistoryOpen(pathname.startsWith('/dashboard/history')); }, [pathname]);
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -348,6 +357,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     open={
                       item.title === 'Data Management' ? dataOpen :
                       item.title === 'Documentation' ? docsOpen :
+                      item.title === 'Exploratory Analysis' ? edaOpen :
+                      item.title === 'Model Laboratory' ? modellabOpen :
                       item.title === 'Model Testing' ? testingOpen :
                       item.title === 'Activity History' ? historyOpen :
                       undefined
@@ -355,12 +366,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     onOpenChange={
                       item.title === 'Data Management' ? setDataOpen :
                       item.title === 'Documentation' ? setDocsOpen :
+                      item.title === 'Exploratory Analysis' ? setEdaOpen :
+                      item.title === 'Model Laboratory' ? setModellabOpen :
                       item.title === 'Model Testing' ? setTestingOpen :
                       item.title === 'Activity History' ? setHistoryOpen :
                       undefined
                     }
-                    defaultOpen={item.title === 'Model Testing' ? pathname.startsWith('/dashboard/testing') : 
-                                 item.title === 'Activity History' ? pathname.startsWith('/dashboard/history') : false}
+                    defaultOpen={
+                      item.title === 'Data Management' ? pathname.startsWith('/dashboard/data') :
+                      item.title === 'Documentation' ? pathname.startsWith('/dashboard/knowledgehub') :
+                      item.title === 'Exploratory Analysis' ? pathname.startsWith('/dashboard/eda') :
+                      item.title === 'Model Laboratory' ? pathname.startsWith('/dashboard/modellab') :
+                      item.title === 'Model Testing' ? pathname.startsWith('/dashboard/testing') :
+                      item.title === 'Activity History' ? pathname.startsWith('/dashboard/history') : false}
                     className="group/collapsible mt-2"
                   >
                     <SidebarMenuItem>

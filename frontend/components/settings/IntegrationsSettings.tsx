@@ -39,7 +39,7 @@ export default function IntegrationsSettings() {
       <CardContent className="space-y-8">
         <section aria-labelledby="integrations-list">
           <h2 id="integrations-list" className="font-semibold mb-2 flex items-center gap-2">
-            Third-Party Integrations <span title="Connect or disconnect integrations." className="text-xs cursor-help">?</span>
+            Third-Party Integrations
           </h2>
           <ul className="mb-2">
             {integrations.map(i => (
@@ -56,20 +56,20 @@ export default function IntegrationsSettings() {
         </section>
         <section aria-labelledby="api-keys">
           <h2 id="api-keys" className="font-semibold mb-2 flex items-center gap-2">
-            API Keys <span title="Manage your API keys for integrations." className="text-xs cursor-help">?</span>
+            API Keys
           </h2>
           <Input type="text" placeholder="API Key" value={apiKey} onChange={e => setApiKey(e.target.value)} aria-label="API Key" />
           <Button className="mt-2" onClick={handleSaveApiKey} aria-label="Save API Key">Save</Button>
         </section>
         <section aria-labelledby="webhooks">
           <h2 id="webhooks" className="font-semibold mb-2 flex items-center gap-2">
-            Webhooks <span title="Configure webhooks for real-time updates." className="text-xs cursor-help">?</span>
+            Webhooks
           </h2>
           <Button variant="outline" disabled aria-label="Configure Webhooks">Configure (stub)</Button>
         </section>
         <section aria-labelledby="sso">
           <h2 id="sso" className="font-semibold mb-2 flex items-center gap-2">
-            SSO <span title="Configure Single Sign-On." className="text-xs cursor-help">?</span>
+            SSO
           </h2>
           <Button variant="outline" disabled aria-label="Configure SSO">Configure (stub)</Button>
         </section>

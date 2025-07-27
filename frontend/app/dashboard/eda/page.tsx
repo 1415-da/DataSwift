@@ -16,6 +16,7 @@ import {
   Colors
 } from 'chart.js';
 import { AlertTriangle, Info, Lightbulb, Download } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 ChartJS.register(
   CategoryScale,
@@ -87,6 +88,7 @@ const EDAOverviewPage = () => {
   const chartRefs = useRef<Record<string, any>>({});
   // Add a loading state for PDF export
   const [pdfExporting, setPdfExporting] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchDatasets = async () => {
@@ -428,27 +430,37 @@ const EDAOverviewPage = () => {
 
       {/* 4. Export & Collaboration Card (Download full report, feedback, etc.) */}
       {runEDA && !analyzeLoading && (
-        <Card title={<span id="export" className="text-3xl font-extrabold">Export</span>}>
-          <div className="flex gap-4 items-center">
-            <button
-              className="flex items-center gap-2 px-3 py-2 rounded border border-primary text-primary font-semibold bg-transparent hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary/50"
-              aria-label="Download PDF Report"
-              onClick={() => handleDownloadReport('pdf')}
-              disabled={pdfExporting}
-            >
-              <Download className="w-4 h-4" />
-              <span>{pdfExporting ? 'Preparing PDF...' : 'PDF Report'}</span>
-            </button>
-            <button
-              className="flex items-center gap-2 px-3 py-2 rounded border border-primary text-primary font-semibold bg-transparent hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary/50"
-              aria-label="Download HTML Report"
-              onClick={() => handleDownloadReport('html')}
-            >
-              <Download className="w-4 h-4" />
-              <span>HTML Report</span>
-            </button>
-          </div>
-        </Card>
+        <>
+          <Card title={<span id="export" className="text-3xl font-extrabold">Export</span>}>
+            <div className="flex gap-4 items-center">
+              <button
+                className="flex items-center gap-2 px-3 py-2 rounded border border-primary text-primary font-semibold bg-transparent hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                aria-label="Download PDF Report"
+                onClick={() => handleDownloadReport('pdf')}
+                disabled={pdfExporting}
+              >
+                <Download className="w-4 h-4" />
+                <span>{pdfExporting ? 'Preparing PDF...' : 'PDF Report'}</span>
+              </button>
+              <button
+                className="flex items-center gap-2 px-3 py-2 rounded border border-primary text-primary font-semibold bg-transparent hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                aria-label="Download HTML Report"
+                onClick={() => handleDownloadReport('html')}
+              >
+                <Download className="w-4 h-4" />
+                <span>HTML Report</span>
+              </button>
+              <button
+                className="flex items-center gap-2 px-3 py-2 rounded border border-red-600 text-red-600 font-bold bg-transparent hover:bg-red-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-400"
+                aria-label="Train Model"
+                onClick={() => router.push(`/dashboard/modellab?dataset_id=${selectedId}&deploy=1`)}
+                disabled={!selectedId}
+              >
+                <span>Train & Deploy Model</span>
+              </button>
+            </div>
+          </Card>
+        </>
       )}
     </div>
   );

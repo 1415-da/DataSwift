@@ -107,21 +107,21 @@ export default function BillingSettings() {
       <CardContent className="space-y-8">
         <section aria-labelledby="plan">
           <h2 id="plan" className="font-semibold mb-2 flex items-center gap-2">
-            Current Plan <span title="Your current subscription plan." className="text-xs cursor-help">?</span>
+            Current Plan
           </h2>
           <div className="mb-2">{plan}</div>
           <Button variant="outline" disabled aria-label="Change Plan">Change Plan (stub)</Button>
         </section>
         <section aria-labelledby="payment">
           <h2 id="payment" className="font-semibold mb-2 flex items-center gap-2">
-            Payment Methods <span title="Update your payment method." className="text-xs cursor-help">?</span>
+            Payment Methods
           </h2>
           <Input type="text" value={payment} onChange={e => setPayment(e.target.value)} aria-label="Payment Method" />
           <Button className="mt-2" onClick={handleUpdatePayment} aria-label="Update Payment" disabled={loading}>{loading ? "Saving..." : "Update Payment"}</Button>
         </section>
         <section aria-labelledby="invoices">
           <h2 id="invoices" className="font-semibold mb-2 flex items-center gap-2">
-            Invoices <span title="Download your past invoices." className="text-xs cursor-help">?</span>
+            Invoices
           </h2>
           <ul className="mb-2">
             {invoices.map(inv => (
@@ -134,13 +134,13 @@ export default function BillingSettings() {
         </section>
         <section aria-labelledby="manage">
           <h2 id="manage" className="font-semibold mb-2 flex items-center gap-2">
-            Manage Subscription <span title="Manage or cancel your subscription." className="text-xs cursor-help">?</span>
+            Manage Subscription
           </h2>
           <Button variant="outline" onClick={handleManage} aria-label="Manage Subscription" disabled={loading}>{loading ? "Processing..." : "Manage/Cancel"}</Button>
         </section>
         <section aria-labelledby="support">
           <h2 id="support" className="font-semibold mb-2 flex items-center gap-2">
-            Contact Support <span title="Contact support for billing issues." className="text-xs cursor-help">?</span>
+            Contact Support
           </h2>
           <Button variant="outline" onClick={handleContact} aria-label="Contact Support" disabled={loading}>{loading ? "Contacting..." : "Contact"}</Button>
         </section>

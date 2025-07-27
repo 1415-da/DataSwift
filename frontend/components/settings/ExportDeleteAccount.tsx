@@ -71,13 +71,13 @@ export default function ExportDeleteAccount() {
       <CardContent className="space-y-8">
         <section aria-labelledby="export-data">
           <h2 id="export-data" className="font-semibold mb-2 flex items-center gap-2">
-            Download My Data <span title="Export your data for compliance or backup." className="text-xs cursor-help">?</span>
+            Download My Data
           </h2>
           <Button variant="outline" onClick={handleDownload} aria-label="Download My Data" disabled={loading}>{loading ? "Exporting..." : "Download My Data"}</Button>
         </section>
         <section aria-labelledby="delete-account">
           <h2 id="delete-account" className="font-semibold mb-2 flex items-center gap-2">
-            Delete Account <span title="This action is irreversible." className="text-xs cursor-help">?</span>
+            Delete Account
           </h2>
           <Button variant="destructive" onClick={handleDelete} aria-label="Delete Account" disabled={loading} className="font-bold hover:bg-red-700 hover:text-white">Delete Account</Button>
           <div className="text-xs text-muted-foreground mt-2">Warning: This action is irreversible. You will be asked to confirm before deletion.</div>

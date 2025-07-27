@@ -631,47 +631,94 @@ export default function TestingPage() {
           </div>
 
           {/* Confusion Matrix Chart */}
-          <div className="mt-8">
-            <h3 className="font-semibold mb-4">Confusion Matrix Chart</h3>
-            <div className="max-w-md mx-auto">
-              <Doughnut
-                data={{
-                  labels: ['True Positives', 'False Positives', 'False Negatives', 'True Negatives'],
-                  datasets: [{
-                    data: [
-                      confusionMatrix?.true_positives || 0,
-                      confusionMatrix?.false_positives || 0,
-                      confusionMatrix?.false_negatives || 0,
-                      confusionMatrix?.true_negatives || 0
-                    ],
-                    backgroundColor: [
-                      'rgba(34, 197, 94, 0.8)',
-                      'rgba(239, 68, 68, 0.8)',
-                      'rgba(239, 68, 68, 0.8)',
-                      'rgba(34, 197, 94, 0.8)'
-                    ],
-                    borderColor: [
-                      'rgba(34, 197, 94, 1)',
-                      'rgba(239, 68, 68, 1)',
-                      'rgba(239, 68, 68, 1)',
-                      'rgba(34, 197, 94, 1)'
-                    ],
-                    borderWidth: 2
-                  }]
-                }}
-                options={{
-                  responsive: true,
-                  plugins: {
-                    legend: {
-                      position: 'bottom'
-                    },
-                    title: {
-                      display: true,
-                      text: 'Confusion Matrix Distribution'
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+            <div className="flex flex-col items-center">
+              <h3 className="font-semibold mb-4 text-center">Confusion Matrix Chart</h3>
+              <div className="max-w-md w-full mx-auto">
+                <Doughnut
+                  data={{
+                    labels: ['True Positives', 'False Positives', 'False Negatives', 'True Negatives'],
+                    datasets: [{
+                      data: [
+                        confusionMatrix?.true_positives || 0,
+                        confusionMatrix?.false_positives || 0,
+                        confusionMatrix?.false_negatives || 0,
+                        confusionMatrix?.true_negatives || 0
+                      ],
+                      backgroundColor: [
+                        'rgba(34, 197, 94, 0.8)',
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(34, 197, 94, 0.8)'
+                      ],
+                      borderColor: [
+                        'rgba(34, 197, 94, 1)',
+                        'rgba(239, 68, 68, 1)',
+                        'rgba(239, 68, 68, 1)',
+                        'rgba(34, 197, 94, 1)'
+                      ],
+                      borderWidth: 2
+                    }]
+                  }}
+                  options={{
+                    responsive: true,
+                    plugins: {
+                      legend: {
+                        position: 'bottom'
+                      },
+                      title: {
+                        display: true,
+                        text: 'Confusion Matrix Distribution'
+                      }
                     }
-                  }
-                }}
-              />
+                  }}
+                />
+              </div>
+            </div>
+            <div className="flex flex-col items-center">
+              <h3 className="font-semibold mb-4 text-center">Confusion Matrix Bar Plot</h3>
+              <div className="max-w-md w-full mx-auto">
+                <Bar
+                  data={{
+                    labels: ['True Positives', 'False Positives', 'False Negatives', 'True Negatives'],
+                    datasets: [{
+                      label: 'Count',
+                      data: [
+                        confusionMatrix?.true_positives || 0,
+                        confusionMatrix?.false_positives || 0,
+                        confusionMatrix?.false_negatives || 0,
+                        confusionMatrix?.true_negatives || 0
+                      ],
+                      backgroundColor: [
+                        'rgba(34, 197, 94, 0.8)',
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(34, 197, 94, 0.8)'
+                      ],
+                      borderColor: [
+                        'rgba(34, 197, 94, 1)',
+                        'rgba(239, 68, 68, 1)',
+                        'rgba(239, 68, 68, 1)',
+                        'rgba(34, 197, 94, 1)'
+                      ],
+                      borderWidth: 2
+                    }]
+                  }}
+                  options={{
+                    responsive: true,
+                    plugins: {
+                      legend: { display: false },
+                      title: {
+                        display: true,
+                        text: 'Confusion Matrix Bar Plot'
+                      }
+                    },
+                    scales: {
+                      y: { beginAtZero: true }
+                    }
+                  }}
+                />
+              </div>
             </div>
           </div>
         </TestingCard>
