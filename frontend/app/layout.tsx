@@ -3,7 +3,6 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import Providers from "@/components/Providers"
-import Head from "next/head"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -20,10 +19,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <Head>
-        <link rel="icon" type="image/png" href="/placeholder-logo.png" />
-        <title>DataSwift</title>
-      </Head>
       <body className={inter.className} suppressHydrationWarning>
         <Providers>
           {children}

@@ -17,8 +17,6 @@ const nextConfig = {
   trailingSlash: true,
   // Optimize for Vercel
   swcMinify: true,
-  // Configure for serverless deployment
-  output: 'standalone',
   // Increase function timeout for complex operations
   serverRuntimeConfig: {
     maxDuration: 30,
