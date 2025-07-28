@@ -5,6 +5,7 @@ import { toast } from '@/components/ui/use-toast';
 import dynamic from 'next/dynamic';
 import { Progress } from '@/components/ui/progress';
 import { useSearchParams } from 'next/navigation';
+import { Info } from 'lucide-react';
 
 // --- Types ---
 interface DatasetMeta {
@@ -842,6 +843,11 @@ Notes:
     }
   }, [autoDeploy, autoDeployed, latestCompletedExperiment]);
 
+  const [splitRatio, setSplitRatio] = useState(0.8);
+  const [splitSummary, setSplitSummary] = useState<{train: number, test: number} | null>(null);
+  const [splitting, setSplitting] = useState(false);
+  const [activeTrainDataset, setActiveTrainDataset] = useState<DatasetMeta | null>(null);
+
   if (!mounted) {
     // Skeleton loader for SSR
     return <div className="max-w-5xl mx-auto px-4 py-10 animate-pulse">Loading...</div>;
@@ -889,13 +895,136 @@ Notes:
         </div>
       </Card>
 
+      {/* 1.5. Train-Test Split */}
+      <Card title={<span id="train-test-split" className="text-2xl font-bold">Train-Test Split</span>}>
+        <div className="flex flex-col gap-4">
+          <label className="font-semibold">Split Ratio (Train %)</label>
+          <input
+            type="range"
+            min={0.5}
+            max={0.95}
+            step={0.01}
+            value={splitRatio}
+            onChange={e => setSplitRatio(Number(e.target.value))}
+            className="w-full max-w-md"
+            disabled={!selectedDataset || splitting}
+          />
+          <div className="flex gap-4 text-sm">
+            <span>Train: <span className="font-bold">{Math.round(splitRatio * 100)}%</span></span>
+            <span>Test: <span className="font-bold">{100 - Math.round(splitRatio * 100)}%</span></span>
+          </div>
+          <button
+            className="px-6 py-2 rounded bg-primary text-primary-foreground font-semibold border border-primary shadow hover:bg-primary/90 hover:border-white transition-all w-fit"
+            onClick={async () => {
+              if (!selectedDataset) return;
+              setSplitting(true);
+              setSplitSummary(null);
+              try {
+                const res = await fetch(`/api/data/split`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ dataset_id: selectedDataset.dataset_id, train_ratio: splitRatio }),
+                });
+                if (!res.ok) throw new Error('Failed to split dataset');
+                const data = await res.json();
+                setSplitSummary({ train: data.train_size, test: data.test_size });
+                toast({ title: 'Split successful', description: `Train: ${data.train_size} rows, Test: ${data.test_size} rows` });
+                // Refresh datasets and set activeTrainDataset
+                if (data.train_dataset_id) {
+                  const dsRes = await fetch('/api/data/list');
+                  const dsList = await dsRes.json();
+                  setDatasets(dsList);
+                  const trainDs = dsList.find((d: any) => d.dataset_id === data.train_dataset_id);
+                  if (trainDs) setActiveTrainDataset(trainDs);
+                }
+              } catch (err: any) {
+                toast({ title: 'Error', description: err.message || 'Failed to split dataset', variant: 'destructive' });
+              } finally {
+                setSplitting(false);
+              }
+            }}
+            disabled={!selectedDataset || splitting}
+          >
+            {splitting ? 'Splitting...' : 'Apply Split'}
+          </button>
+          {splitSummary && (
+            <div className="text-green-700 font-medium mt-2">Split applied: Train = {splitSummary.train} rows, Test = {splitSummary.test} rows</div>
+          )}
+          {splitSummary && selectedDataset && (
+            <div className="flex gap-4 mt-2">
+              <button
+                className="px-5 py-2 rounded bg-primary text-primary-foreground font-semibold border border-primary shadow hover:bg-primary/90 hover:border-white transition-all"
+                onClick={async () => {
+                  try {
+                    const res = await fetch(`/api/data/download_train?dataset_id=${selectedDataset.dataset_id}`);
+                    if (!res.ok) throw new Error('Failed to download train set');
+                    const blob = await res.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${selectedDataset.filename.replace(/\.[^/.]+$/, '')}_train.csv`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                    toast({ title: 'Train set downloaded' });
+                  } catch (err: any) {
+                    toast({ title: 'Error', description: err.message || 'Failed to download train set', variant: 'destructive' });
+                  }
+                }}
+              >
+                Download Train
+              </button>
+              <button
+                className="px-5 py-2 rounded bg-primary text-primary-foreground font-semibold border border-primary shadow hover:bg-primary/90 hover:border-white transition-all"
+                onClick={async () => {
+                  try {
+                    const res = await fetch(`/api/data/download_test?dataset_id=${selectedDataset.dataset_id}`);
+                    if (!res.ok) throw new Error('Failed to download test set');
+                    const blob = await res.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${selectedDataset.filename.replace(/\.[^/.]+$/, '')}_test.csv`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                    toast({ title: 'Test set downloaded' });
+                  } catch (err: any) {
+                    toast({ title: 'Error', description: err.message || 'Failed to download test set', variant: 'destructive' });
+                  }
+                }}
+              >
+                Download Test
+              </button>
+            </div>
+          )}
+        </div>
+      </Card>
+
       {/* 2. Model Config & Creation */}
       <Card title={<span id="configure-model" className="text-3xl font-extrabold">Configure Model</span>}>
-        {selectedDataset && task && algorithm && (
+        {activeTrainDataset && (
+          <div className="mb-6 p-5 rounded-xl bg-accent/80 border border-primary shadow-md flex flex-col gap-2">
+            <div className="flex items-center gap-2 text-white italic">
+              <Info className="w-5 h-5 text-white opacity-80" />
+              <span className="font-semibold not-italic">Note:</span>
+              <span>Using split training set for all model operations.</span>
+            </div>
+            <div className="flex items-center gap-2 text-white italic">
+              <Info className="w-5 h-5 text-white opacity-80" />
+              <span className="font-semibold not-italic">Note:</span>
+              <span>Your train dataset is going for training.</span>
+            </div>
+          </div>
+        )}
+        {/* Use activeTrainDataset if set, otherwise selectedDataset for all config/experiment logic */}
+        {(activeTrainDataset || selectedDataset) && task && algorithm && (
           <div className="mb-6 p-5 rounded-xl bg-accent/80 border border-primary shadow-md flex flex-col gap-2">
             <div className="font-semibold text-base mb-1 text-primary">Model Recommendation</div>
             <ModelSummary
-              dataset={selectedDataset.dataset_id}
+              dataset={(activeTrainDataset || selectedDataset)!.dataset_id}
               task={task}
               algorithm={algorithm}
             />
@@ -959,7 +1088,7 @@ Notes:
             </div>
           )}
           {/* Target column selection */}
-          {selectedDataset && (
+          {(activeTrainDataset || selectedDataset) && (
             <div className="space-y-2">
               <label className="font-semibold text-base text-foreground">Target Column</label>
               <select
@@ -968,18 +1097,18 @@ Notes:
                 onChange={e => setTarget(e.target.value)}
               >
                 <option value="" disabled>Select target...</option>
-                {Array.isArray(selectedDataset.features) && selectedDataset.features.map(col => (
+                {Array.isArray((activeTrainDataset || selectedDataset)?.features) && (activeTrainDataset || selectedDataset)!.features.map(col => (
                   <option key={col} value={col}>{col}</option>
                 ))}
               </select>
             </div>
           )}
           {/* Feature columns multi-select */}
-          {selectedDataset && (
+          {(activeTrainDataset || selectedDataset) && (
             <div className="space-y-2">
               <label className="font-semibold text-base text-foreground">Feature Columns</label>
               <div className="flex flex-wrap gap-3 p-4 rounded-lg border border-border bg-muted/30">
-                {Array.isArray(selectedDataset.features) && selectedDataset.features.map(col => (
+                {Array.isArray((activeTrainDataset || selectedDataset)?.features) && (activeTrainDataset || selectedDataset)!.features.map(col => (
                   <label key={col} className="flex items-center gap-2 border border-border rounded-lg px-3 py-2 cursor-pointer text-base font-medium text-foreground bg-background shadow-sm transition-all hover:border-primary hover:bg-primary/5">
                     <input
                       type="checkbox"

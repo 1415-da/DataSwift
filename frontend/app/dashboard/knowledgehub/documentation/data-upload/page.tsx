@@ -310,6 +310,9 @@ export default function DataUploadArticle() {
         <div className="space-y-6">
           <div className="bg-card border rounded-lg p-6">
             <h3 className="text-lg font-semibold mb-3">Best Practices</h3>
+            <p className="mb-4 text-muted-foreground">
+              <strong>New:</strong> Use the <Link href="/dashboard/data#feature-engineering" className="text-primary underline">Data Transformation</Link> section to perform feature engineering, encoding, scaling, and train-test split before modeling. Splitting your data ensures robust model evaluation and prevents overfitting.
+            </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <h4 className="font-semibold mb-3">Data Cleaning</h4>

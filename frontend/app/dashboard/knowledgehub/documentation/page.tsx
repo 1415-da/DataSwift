@@ -17,8 +17,13 @@ const docs = [
     link: "/dashboard/knowledgehub/documentation/eda",
   },
   {
+    title: "Data Transformation",
+    description: "Transform your data with feature engineering, encoding, scaling, and export tools before modeling.",
+    link: "/dashboard/knowledgehub/documentation/data-transformation",
+  },
+  {
     title: "ModelLab",
-    description: "Train, compare, and test machine learning models with AI guidance.",
+    description: "Train, compare, and test machine learning models with AI guidance. Now includes train-test split for robust evaluation.",
     link: "/dashboard/knowledgehub/documentation/modellab",
   },
   {

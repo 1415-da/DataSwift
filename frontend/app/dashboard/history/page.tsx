@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, Search, Filter, Download, Eye, Clock, Activity, Database, FlaskConical, BarChart3, Upload, Users, Settings, CheckCircle, AlertCircle } from 'lucide-react';
+import { Calendar, Search, Filter, Download, Eye, Clock, Activity, Database, FlaskConical, BarChart3, Upload, Users, Settings, CheckCircle, AlertCircle, Info } from 'lucide-react';
 
 interface HistoryItem {
   _id: string;
@@ -159,6 +159,10 @@ export default function HistoryPage() {
         return <Settings className="w-4 h-4" />;
       case 'user_activity':
         return <Users className="w-4 h-4" />;
+      case 'data_transformation':
+        return <BarChart3 className="w-4 h-4 text-purple-600" />;
+      case 'train_test_split':
+        return <CheckCircle className="w-4 h-4 text-blue-600" />;
       default:
         return <Activity className="w-4 h-4" />;
     }
@@ -182,6 +186,10 @@ export default function HistoryPage() {
         return 'Settings Change';
       case 'user_activity':
         return 'User Activity';
+      case 'data_transformation':
+        return 'Data Transformation';
+      case 'train_test_split':
+        return 'Train-Test Split';
       default:
         return type;
     }
@@ -367,6 +375,8 @@ export default function HistoryPage() {
                 <SelectItem value="data_export">Data Export</SelectItem>
                 <SelectItem value="settings_change">Settings Change</SelectItem>
                 <SelectItem value="user_activity">User Activity</SelectItem>
+                <SelectItem value="data_transformation">Data Transformation</SelectItem>
+                <SelectItem value="train_test_split">Train-Test Split</SelectItem>
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>

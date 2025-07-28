@@ -93,6 +93,7 @@ const edaSubItems = [
 
 const modellabSubItems = [
   { title: "Dataset Selection", url: "/dashboard/modellab#select-dataset" },
+  { title: "Train-Test Split", url: "/dashboard/modellab#train-test-split" },
   { title: "Model Configuration", url: "/dashboard/modellab#configure-model" },
   { title: "Training Experiments", url: "/dashboard/modellab#experiments" },
   { title: "Results Analysis", url: "/dashboard/modellab#results" },
@@ -113,9 +114,17 @@ const historySubItems = [
   { title: "Export Data", url: "/dashboard/history#export" },
 ];
 
+const transformationSubItems = [
+  { title: "Feature Engineering", url: "/dashboard/data#feature-engineering" },
+  { title: "Encoding", url: "/dashboard/data#encoding" },
+  { title: "Scaling", url: "/dashboard/data#scaling" },
+  { title: "Export", url: "/dashboard/data#export" },
+];
+
 const mainNav = [
   { title: "Data Management", icon: Database, subItems: dataSubItems },
   { title: "Exploratory Analysis", url: "/dashboard/eda", icon: BarChart2, subItems: edaSubItems },
+  { title: "Data Transformation", url: "/dashboard/transformation#feature-engineering", icon: Layers, subItems: transformationSubItems },
   { title: "Model Laboratory", url: "/dashboard/modellab", icon: FlaskConical, subItems: modellabSubItems },
   { title: "Model Testing", url: "/dashboard/testing", icon: CheckCircle2, subItems: testingSubItems },
   { title: "Team Collaboration", url: "/dashboard/collaboration", icon: Users },
@@ -133,6 +142,7 @@ const mainNavHref = {
   "Model Testing": '/dashboard/testing',
   "Team Collaboration": '/dashboard/collaboration',
   "Activity History": '/dashboard/history',
+  "Data Transformation": '/dashboard/transformation',
 };
 
 // Add EDA section IDs for scroll tracking
@@ -168,6 +178,13 @@ const historySectionIds = [
   'export',
 ];
 
+const transformationSectionIds = [
+  'feature-engineering',
+  'encoding',
+  'scaling',
+  'export',
+];
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { setTheme, theme } = useTheme();
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
@@ -186,6 +203,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [activeModelLabSection, setActiveModelLabSection] = useState('select-dataset');
   const [activeTestingSection, setActiveTestingSection] = useState('model-selection');
   const [activeHistorySection, setActiveHistorySection] = useState('overview');
+  const [activeTransformationSection, setActiveTransformationSection] = useState('feature-engineering');
+  const [transformationOpen, setTransformationOpen] = useState(pathname.startsWith('/dashboard/transformation'));
 
   // Track hash for Docs section
   useEffect(() => {
@@ -323,6 +342,31 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [pathname]);
 
+  // Scroll tracking for Data Transformation
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!pathname.startsWith('/dashboard/transformation')) return;
+    const handleScroll = () => {
+      let current = transformationSectionIds[0];
+      for (const id of transformationSectionIds) {
+        const el = document.getElementById(id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= 80) {
+            current = id;
+          }
+        }
+      }
+      if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 2)) {
+        current = transformationSectionIds[transformationSectionIds.length - 1];
+      }
+      setActiveTransformationSection(current);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [pathname]);
+
   // Update testingOpen when pathname changes
   useEffect(() => {
     setTestingOpen(pathname.startsWith('/dashboard/testing'));
@@ -334,6 +378,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   useEffect(() => { setDocsOpen(pathname.startsWith('/dashboard/knowledgehub')); }, [pathname]);
   useEffect(() => { setTestingOpen(pathname.startsWith('/dashboard/testing')); }, [pathname]);
   useEffect(() => { setHistoryOpen(pathname.startsWith('/dashboard/history')); }, [pathname]);
+  useEffect(() => { setTransformationOpen(pathname.startsWith('/dashboard/transformation')); }, [pathname]);
 
   return (
     <Sidebar {...props}>
@@ -361,6 +406,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       item.title === 'Model Laboratory' ? modellabOpen :
                       item.title === 'Model Testing' ? testingOpen :
                       item.title === 'Activity History' ? historyOpen :
+                      item.title === 'Data Transformation' ? transformationOpen :
                       undefined
                     }
                     onOpenChange={
@@ -370,6 +416,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       item.title === 'Model Laboratory' ? setModellabOpen :
                       item.title === 'Model Testing' ? setTestingOpen :
                       item.title === 'Activity History' ? setHistoryOpen :
+                      item.title === 'Data Transformation' ? setTransformationOpen :
                       undefined
                     }
                     defaultOpen={
@@ -378,7 +425,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       item.title === 'Exploratory Analysis' ? pathname.startsWith('/dashboard/eda') :
                       item.title === 'Model Laboratory' ? pathname.startsWith('/dashboard/modellab') :
                       item.title === 'Model Testing' ? pathname.startsWith('/dashboard/testing') :
-                      item.title === 'Activity History' ? pathname.startsWith('/dashboard/history') : false}
+                      item.title === 'Activity History' ? pathname.startsWith('/dashboard/history') :
+                      item.title === 'Data Transformation' ? pathname.startsWith('/dashboard/transformation') : false}
                     className="group/collapsible mt-2"
                   >
                     <SidebarMenuItem>
@@ -395,6 +443,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             else if (item.title === 'Model Testing') setManualActiveSection('testing');
                             else if (item.title === 'Team Collaboration') setManualActiveSection('collaboration');
                             else if (item.title === 'Activity History') setManualActiveSection('history');
+                            else if (item.title === 'Data Transformation') setManualActiveSection('feature-engineering');
                           }}
                         >
                           <SidebarMenuButton
@@ -407,6 +456,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                               (item.title === 'Team Collaboration' && pathname.startsWith('/dashboard/collaboration')) ? 'bg-primary/10 text-primary' :
                               (item.title === 'Documentation' && pathname.startsWith('/dashboard/knowledgehub')) ? 'bg-primary/10 text-primary' :
                               (item.title === 'Activity History' && pathname.startsWith('/dashboard/history')) ? 'bg-primary/10 text-primary' :
+                              (item.title === 'Data Transformation' && pathname.startsWith('/dashboard/transformation')) ? 'bg-primary/10 text-primary' :
                               ''
                             ].join(' ')}
                           >
@@ -424,7 +474,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                (item.title === 'Model Testing' && pathname.startsWith('/dashboard/testing')) ||
                                (item.title === 'Team Collaboration' && pathname.startsWith('/dashboard/collaboration')) ||
                                (item.title === 'Documentation' && pathname.startsWith('/dashboard/knowledgehub')) ||
-                               (item.title === 'Activity History' && pathname.startsWith('/dashboard/history'))
+                               (item.title === 'Activity History' && pathname.startsWith('/dashboard/history')) ||
+                               (item.title === 'Data Transformation' && pathname.startsWith('/dashboard/transformation'))
                               ) && (
                                 <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1.5 rounded-full bg-primary shadow-lg transition-all duration-300" />
                               )
@@ -456,6 +507,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                  isActive = pathname === '/dashboard/testing' && ((hoveredSection && hoveredSection === hash) || (!hoveredSection && (manualActiveSection ? manualActiveSection === hash : activeTestingSection === hash)));
                                } else if (item.title === 'Activity History') {
                                  isActive = pathname === '/dashboard/history' && ((hoveredSection && hoveredSection === hash) || (!hoveredSection && (manualActiveSection ? manualActiveSection === hash : activeHistorySection === hash)));
+                               } else if (item.title === 'Data Transformation') {
+                                 isActive = pathname === '/dashboard/transformation' && ((hoveredSection && hoveredSection === hash) || (!hoveredSection && (manualActiveSection ? manualActiveSection === hash : activeTransformationSection === hash)));
                                }
                               return (
                                 <SidebarMenuSubItem key={subItem.title}>
@@ -472,6 +525,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                         if (subItem.url.startsWith('/dashboard/data#')) {
                                           e.preventDefault();
                                           const hashId = subItem.url.split('#')[1];
+                                          setManualActiveSection(hashId);
                                           const el = document.getElementById(hashId);
                                           if (el) {
                                             el.scrollIntoView({ behavior: 'smooth', block: 'start' });

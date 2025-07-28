@@ -328,6 +328,17 @@ export default function EDAArticle() {
             <ArrowRight className="w-4 h-4 ml-auto" />
           </Link>
         </div>
+        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-start gap-3">
+            <Info className="w-5 h-5 text-blue-600 mt-0.5" />
+            <div>
+              <h4 className="font-semibold text-blue-800 mb-1">Next Step: Data Transformation</h4>
+              <p className="text-sm text-blue-700">
+                After EDA, use the <Link href="/dashboard/data#feature-engineering" className="text-primary underline">Data Transformation</Link> section to perform feature engineering, encoding, scaling, and train-test split before building your models.
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
     </div>
   );

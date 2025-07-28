@@ -213,6 +213,57 @@ async def clean_data(dataset_id: str = Query(...), method: str = Query("auto"), 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+@router.post("/split")
+async def split_dataset(dataset_id: str = Body(...), train_ratio: float = Body(...)):
+    """
+    Split the dataset into train and test sets and store them in memory.
+    Returns new dataset IDs for train and test sets and their sizes.
+    """
+    from ..services.eda_service import DATASETS
+    import numpy as np
+    import pandas as pd
+    import uuid
+
+    df = DATASETS.get(dataset_id)
+    if df is None:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+
+    # Shuffle and split
+    df_shuffled = df.sample(frac=1, random_state=42).reset_index(drop=True)
+    train_size = int(len(df_shuffled) * train_ratio)
+    train_df = df_shuffled.iloc[:train_size]
+    test_df = df_shuffled.iloc[train_size:]
+
+    # Store new datasets
+    train_id = str(uuid.uuid4())
+    test_id = str(uuid.uuid4())
+    DATASETS[train_id] = train_df
+    DATASETS[test_id] = test_df
+
+    # Optionally, update DATASET_METADATA if you want them to appear in /list
+    from datetime import datetime
+    DATASET_METADATA[train_id] = {
+        "dataset_id": train_id,
+        "filename": f"train_{dataset_id}.csv",
+        "size": len(train_df),
+        "upload_date": datetime.utcnow().isoformat(),
+        "status": "split-train"
+    }
+    DATASET_METADATA[test_id] = {
+        "dataset_id": test_id,
+        "filename": f"test_{dataset_id}.csv",
+        "size": len(test_df),
+        "upload_date": datetime.utcnow().isoformat(),
+        "status": "split-test"
+    }
+
+    return {
+        "train_dataset_id": train_id,
+        "test_dataset_id": test_id,
+        "train_size": len(train_df),
+        "test_size": len(test_df)
+    }
+
 @router.delete("/delete")
 async def delete_dataset(dataset_id: str = Query(...)):
     """Delete a dataset by dataset_id (in memory)"""
@@ -252,3 +303,29 @@ async def insights(dataset_id: str = Query(...)):
         return result
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/download_train")
+async def download_train(dataset_id: str = Query(...)):
+    """Download the training split as CSV"""
+    from ..services.eda_service import DATASETS
+    df = DATASETS.get(dataset_id)
+    if df is None:
+        raise HTTPException(status_code=404, detail="Train dataset not found")
+    import io
+    buf = io.BytesIO()
+    df.to_csv(buf, index=False)
+    buf.seek(0)
+    return Response(content=buf.read(), media_type="text/csv")
+
+@router.get("/download_test")
+async def download_test(dataset_id: str = Query(...)):
+    """Download the test split as CSV"""
+    from ..services.eda_service import DATASETS
+    df = DATASETS.get(dataset_id)
+    if df is None:
+        raise HTTPException(status_code=404, detail="Test dataset not found")
+    import io
+    buf = io.BytesIO()
+    df.to_csv(buf, index=False)
+    buf.seek(0)
+    return Response(content=buf.read(), media_type="text/csv")

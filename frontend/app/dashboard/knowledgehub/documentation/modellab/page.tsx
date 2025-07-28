@@ -129,6 +129,33 @@ export default function ModelLabArticle() {
         </div>
       </section>
 
+      {/* Train-Test Split */}
+      <section id="train-test-split" className="mb-12">
+        <h2 className="text-2xl font-semibold mb-4">Train-Test Split</h2>
+        <div className="space-y-6">
+          <div className="bg-card border rounded-lg p-6">
+            <h3 className="text-lg font-semibold mb-3">How to Use Train-Test Split</h3>
+            <ol className="list-decimal list-inside space-y-2 text-muted-foreground mb-6">
+              <li>After selecting your dataset, use the Train-Test Split slider to choose the split ratio (e.g., 80% train, 20% test).</li>
+              <li>Click "Apply Split" to create separate training and testing datasets.</li>
+              <li>Download the train and test sets as CSV files if needed.</li>
+              <li>All subsequent model configuration and training will use the split training set automatically.</li>
+            </ol>
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-start gap-3">
+                <Info className="w-5 h-5 text-blue-600 mt-0.5" />
+                <div>
+                  <h4 className="font-semibold text-blue-800 mb-1">Why Split?</h4>
+                  <p className="text-sm text-blue-700">
+                    Splitting your data ensures that your model is trained and validated on separate data, preventing overfitting and providing a realistic estimate of model performance.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Algorithms */}
       <section id="algorithms" className="mb-12">
         <h2 className="text-2xl font-semibold mb-4">Supported Algorithms</h2>
