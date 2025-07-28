@@ -9,29 +9,19 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  async rewrites() {
-    return [
-      {
-        source: '/api/data/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/data/:path*`,
-      },
-      {
-        source: '/api/model/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/model/:path*`,
-      },
-      {
-        source: '/api/predict/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/predict/:path*`,
-      },
-      {
-        source: '/api/knowledge/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/knowledge/:path*`,
-      },
-      {
-        source: '/api/user/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/user/:path*`,
-      },
-    ];
+  // Optimize for Vercel serverless functions
+  experimental: {
+    serverComponentsExternalPackages: ['pandas', 'numpy', 'scikit-learn'],
+  },
+  // Enable static exports for better performance
+  trailingSlash: true,
+  // Optimize for Vercel
+  swcMinify: true,
+  // Configure for serverless deployment
+  output: 'standalone',
+  // Increase function timeout for complex operations
+  serverRuntimeConfig: {
+    maxDuration: 30,
   },
 }
 
