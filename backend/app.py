@@ -16,6 +16,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://your-frontend.vercel.app",
+        "https://dataswift-frontend.onrender.com",
         "http://localhost:3000"
     ],
     allow_credentials=True,
