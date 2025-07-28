@@ -115,15 +115,14 @@ export default function LandingPagePreview() {
   // Splash screen state
   const [showSplash, setShowSplash] = useState(false);
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const seenSplash = sessionStorage.getItem('dataswift_splash_seen');
-      if (!seenSplash) {
-        setShowSplash(true);
-        setTimeout(() => {
-          setShowSplash(false);
-          sessionStorage.setItem('dataswift_splash_seen', 'true');
-        }, 1700);
-      }
+    // Only run on client side after component mounts
+    const seenSplash = sessionStorage.getItem('dataswift_splash_seen');
+    if (!seenSplash) {
+      setShowSplash(true);
+      setTimeout(() => {
+        setShowSplash(false);
+        sessionStorage.setItem('dataswift_splash_seen', 'true');
+      }, 1700);
     }
   }, []);
 
@@ -371,7 +370,7 @@ export default function LandingPagePreview() {
             </div>
 
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>{mounted && theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}</Button>
+              <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>{mounted ? (theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />) : <Moon className="h-5 w-5" />}</Button>
               {!user && (
                 <>
                   <Button variant="ghost" onClick={() => setLoginOpen(true)}>Login</Button>

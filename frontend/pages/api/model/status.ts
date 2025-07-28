@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
+  if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
@@ -14,8 +14,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Forward the request to the backend
     const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000';
-    const response = await fetch(`${backendUrl}/api/model/train?experiment_id=${experiment_id}`, {
-      method: 'POST',
+    const response = await fetch(`${backendUrl}/api/model/status/${experiment_id}`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const data = await response.json();
     return res.status(response.status).json(data);
   } catch (error) {
-    console.error('Train error:', error);
-    return res.status(500).json({ error: 'Failed to start training' });
+    console.error('Status error:', error);
+    return res.status(500).json({ error: 'Failed to get training status' });
   }
 } 

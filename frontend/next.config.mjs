@@ -9,17 +9,29 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Optimize for Vercel serverless functions
-  experimental: {
-    serverComponentsExternalPackages: ['pandas', 'numpy', 'scikit-learn'],
-  },
-  // Enable static exports for better performance
-  trailingSlash: true,
-  // Optimize for Vercel
-  swcMinify: true,
-  // Increase function timeout for complex operations
-  serverRuntimeConfig: {
-    maxDuration: 30,
+  async rewrites() {
+    return [
+      {
+        source: '/api/data/:path*',
+        destination: 'http://localhost:8000/api/data/:path*',
+      },
+      {
+        source: '/api/model/:path*',
+        destination: 'http://localhost:8000/api/model/:path*',
+      },
+      {
+        source: '/api/predict/:path*',
+        destination: 'http://localhost:8000/api/predict/:path*',
+      },
+      {
+        source: '/api/knowledge/:path*',
+        destination: 'http://localhost:8000/api/knowledge/:path*',
+      },
+      {
+        source: '/api/user/:path*',
+        destination: 'http://localhost:8000/api/user/:path*',
+      },
+    ];
   },
 }
 

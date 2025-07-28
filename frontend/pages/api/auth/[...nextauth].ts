@@ -1,23 +1,17 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
-import TwitterProvider from "next-auth/providers/twitter";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { getDb } from '../../../lib/db';
 
-export default NextAuth({
+export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID || "your-google-client-id",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "your-google-client-secret",
     }),
     GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-    }),
-    TwitterProvider({
-      clientId: process.env.TWITTER_CLIENT_ID!,
-      clientSecret: process.env.TWITTER_CLIENT_SECRET!,
+      clientId: process.env.GITHUB_CLIENT_ID || "your-github-client-id",
+      clientSecret: process.env.GITHUB_CLIENT_SECRET || "your-github-client-secret",
     }),
     CredentialsProvider({
       name: "Credentials",
@@ -42,33 +36,30 @@ export default NextAuth({
   ],
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   pages: {
     signIn: "/", // Stay on homepage for login/signup
   },
   callbacks: {
     async signIn({ user, account, profile }) {
-      if (account?.provider !== "credentials") {
-        const db = await getDb();
-        const users = db.collection("users");
-        const existing = await users.findOne({ email: user.email });
-        if (!existing) {
-          await users.insertOne({
-            name: user.name,
-            email: user.email,
-            avatarUrl: user.image,
-            category: "free",
-            createdAt: new Date(),
-            lastLogin: new Date(),
-          });
-        } else {
-          await users.updateOne(
-            { email: user.email },
-            { $set: { lastLogin: new Date() } }
-          );
-        }
-      }
+      // Simplified callback without database dependency
       return true;
     },
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.id as string;
+      }
+      return session;
+    },
   },
-}); 
+  secret: process.env.NEXTAUTH_SECRET || "your-secret-key-here-change-this-in-production",
+};
+
+export default NextAuth(authOptions); 

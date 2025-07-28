@@ -6,7 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <SessionProvider>
+    <SessionProvider session={null}>
       <AuthProvider>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange={false}>
           {children}

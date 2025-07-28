@@ -354,9 +354,9 @@ export default function TestingPage() {
               setSelectedModel(model || null);
             }}
           >
-            <option value="">Choose a model...</option>
-            {deployedModels.map(model => (
-              <option key={model.experiment_id} value={model.experiment_id}>
+            <option key="default" value="">Choose a model...</option>
+            {deployedModels.map((model, index) => (
+              <option key={model.experiment_id || `model-${index}`} value={model.experiment_id}>
                 {model.config?.algorithm || model.algorithm} - {model.config?.task || model.task} (ID: {model.experiment_id})
               </option>
             ))}

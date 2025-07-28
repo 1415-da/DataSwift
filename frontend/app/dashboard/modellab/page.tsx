@@ -197,7 +197,8 @@ const ModelLabPageImpl = () => {
   const fetchExperiments = async () => {
     if (!selectedDataset) return;
     try {
-      const res = await fetch(`/api/model/experiments?user_id=demo&dataset_id=${selectedDataset.dataset_id}`);
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+      const res = await fetch(`${backendUrl}/api/model/experiments?user_id=demo&dataset_id=${selectedDataset.dataset_id}`);
       const data = await res.json();
       setExperiments(data.experiments || []);
     } catch {
@@ -250,7 +251,8 @@ const ModelLabPageImpl = () => {
       setTrainingStatus('Creating experiment...');
       setTrainingProgress(10);
       
-      const response = await fetch('/api/model/experiments', {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+      const response = await fetch(`${backendUrl}/api/model/experiments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -789,7 +791,8 @@ Notes:
     setTrainingStatus('Starting training...');
     try {
       // Start training
-      const res = await fetch(`/api/model/train?experiment_id=${exp.experiment_id}`, { method: 'POST' });
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+      const res = await fetch(`${backendUrl}/api/model/train?experiment_id=${exp.experiment_id}`, { method: 'POST' });
       if (!res.ok) throw new Error('Failed to start training');
       setTrainingStatus('Training in progress...');
       toast({ title: 'Training started', description: `Experiment ${exp.experiment_id} is now running.` });
@@ -803,7 +806,7 @@ Notes:
       let status = 'queued';
       while (status !== 'complete' && status !== 'failed') {
         await new Promise(r => setTimeout(r, 2000));
-        const statusRes = await fetch(`/api/model/status/${exp.experiment_id}`);
+        const statusRes = await fetch(`${backendUrl}/api/model/status/${exp.experiment_id}`);
         const statusData = await statusRes.json();
         status = statusData.status;
         setTrainingStatus(`Status: ${status}`);
