@@ -4,15 +4,15 @@
   "description": "A full-stack data science platform with Next.js frontend and Python FastAPI backend",
   "private": true,
   "scripts": {
-    "dev": "pnpm --filter my-v0-project dev",
-    "build": "pnpm --filter my-v0-project build",
-    "start": "pnpm --filter my-v0-project start",
-    "lint": "pnpm --filter my-v0-project lint",
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm install && npm run build",
+    "start": "cd frontend && npm run start",
+    "lint": "cd frontend && npm run lint",
     "dev:backend": "cd backend && python -m uvicorn src.app:app --reload --host 0.0.0.0 --port 8000",
     "install:backend": "cd backend && pip install -r requirements.txt",
-    "test": "pnpm --filter my-v0-project test",
+    "test": "cd frontend && npm run test",
     "clean": "rm -rf node_modules */node_modules dist build .next out",
-    "setup": "pnpm install && pnpm install:backend"
+    "setup": "npm install && npm run install:backend"
   },
   "keywords": [
     "data-science",
@@ -26,8 +26,7 @@
   "author": "DataSwift Team",
   "license": "MIT",
   "engines": {
-    "node": ">=18.0.0",
-    "pnpm": ">=8.0.0"
+    "node": ">=18.0.0"
   },
   "devDependencies": {
     "@types/node": "^22",
