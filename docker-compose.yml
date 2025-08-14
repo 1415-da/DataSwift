@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: dataswift-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: dataswift
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - dataswift-network
+
+  backend:
+    build: ./backend
+    container_name: dataswift-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URI=mongodb://admin:password@mongodb:27017/dataswift?authSource=admin
+    depends_on:
+      - mongodb
+    networks:
+      - dataswift-network
+
+  frontend:
+    build: ./frontend
+    container_name: dataswift-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGODB_URI=mongodb://admin:password@mongodb:27017/dataswift?authSource=admin
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=your-secret-key-here-change-this-in-production
+    depends_on:
+      - backend
+    networks:
+      - dataswift-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  dataswift-network:
+    driver: bridge

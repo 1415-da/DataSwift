@@ -114,7 +114,7 @@ async def export_report(dataset_id: str = Query(...), format: str = Query('html'
 async def preprocess_data(dataset_id: str = Query(...), script: str = Body(...)):
     """Run a preprocessing script on the dataset and update it in memory."""
     try:
-        from services.eda_service import DATASETS
+        from ..services.eda_service import DATASETS
         import pandas as pd
         df = DATASETS.get(dataset_id)
         if df is None:
@@ -137,7 +137,7 @@ async def preprocess_data(dataset_id: str = Query(...), script: str = Body(...))
 async def clean_data(dataset_id: str = Query(...), method: str = Query("auto"), options: dict = Body(None)):
     """Clean the dataset using auto or manual method."""
     try:
-        from services.eda_service import DATASETS
+        from ..services.eda_service import DATASETS
         import pandas as pd
         import numpy as np
         import re
@@ -268,7 +268,7 @@ async def split_dataset(dataset_id: str = Body(...), train_ratio: float = Body(.
 async def delete_dataset(dataset_id: str = Query(...)):
     """Delete a dataset by dataset_id (in memory)"""
     try:
-        from services.eda_service import DATASETS
+        from ..services.eda_service import DATASETS
         if dataset_id in DATASETS:
             del DATASETS[dataset_id]
         if dataset_id in DATASET_METADATA:

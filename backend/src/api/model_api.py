@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, UploadFile, File, BackgroundTasks
+from fastapi import APIRouter, HTTPException, UploadFile, File, BackgroundTasks, Query
 from fastapi.responses import FileResponse
 from typing import List, Dict, Any
 from ..models.db import db, USE_MONGO
@@ -21,15 +21,22 @@ async def list_experiments(user_id: str, dataset_id: str = None):
         if USE_MONGO:
             from bson import ObjectId
             exps = list(db.experiments.find(query))
+            for exp in exps:
+                exp["experiment_id"] = str(exp["_id"])
+                exp["isBest"] = exp.get("isBest", False)
+                exp["isLatest"] = exp.get("isLatest", False)
+                exp["deployed"] = exp.get("deployed", False)
+                exp["endpoint_url"] = exp.get("endpoint_url", "")
+                # Remove the ObjectId to avoid JSON serialization issues
+                exp["_id"] = str(exp["_id"])
         else:
             exps = list(db.experiments.find(query))
-        
-        for exp in exps:
-            exp["experiment_id"] = str(exp["_id"])
-            exp["isBest"] = exp.get("isBest", False)
-            exp["isLatest"] = exp.get("isLatest", False)
-            exp["deployed"] = exp.get("deployed", False)
-            exp["endpoint_url"] = exp.get("endpoint_url", "")
+            for exp in exps:
+                exp["experiment_id"] = str(exp["_id"])
+                exp["isBest"] = exp.get("isBest", False)
+                exp["isLatest"] = exp.get("isLatest", False)
+                exp["deployed"] = exp.get("deployed", False)
+                exp["endpoint_url"] = exp.get("endpoint_url", "")
         return {"experiments": exps}
     except Exception as e:
         print(f"Error in list_experiments: {e}")
@@ -57,7 +64,7 @@ async def delete_experiment(experiment_id: str):
 # --- Training/Status/Results ---
 
 @router.post("/train")
-async def train_model(experiment_id: str, background_tasks: BackgroundTasks):
+async def train_model(experiment_id: str = Query(...), background_tasks: BackgroundTasks = BackgroundTasks()):
     try:
         if USE_MONGO:
             from bson import ObjectId

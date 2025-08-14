@@ -54,11 +54,15 @@ async def get_deployed_models():
     try:
         if USE_MONGO:
             deployed_models = list(db.experiments.find({"deployed": True}))
-            # Convert ObjectId to string for JSON serialization
+            # Convert ObjectId to string for JSON serialization and add experiment_id
             for model in deployed_models:
                 model["_id"] = str(model["_id"])
+                model["experiment_id"] = str(model["_id"])
         else:
             deployed_models = list(db.experiments.find({"deployed": True}))
+            # Add experiment_id for consistency
+            for model in deployed_models:
+                model["experiment_id"] = str(model["_id"])
         
         # If no deployed models found, return mock data for testing
         if not deployed_models:
