@@ -43,7 +43,8 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async signIn({ user, account, profile }) {
-      // Simplified callback without database dependency
+      // Simplified authentication without database dependency
+      console.log('User signing in:', user.email, 'via', account?.provider);
       return true;
     },
     async jwt({ token, user }) {
@@ -55,6 +56,10 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id as string;
+        // Ensure user has a name if not provided
+        if (!session.user.name && session.user.email) {
+          session.user.name = session.user.email.split('@')[0];
+        }
       }
       return session;
     },

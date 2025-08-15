@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { useSearchParams } from 'next/navigation';
 import { Info } from 'lucide-react';
 
+
 // --- Types ---
 interface DatasetMeta {
   dataset_id: string;
@@ -164,6 +165,9 @@ const ModelLabPageImpl = () => {
   const [modalBatchPred, setModalBatchPred] = useState<any[]>([]);
   const [modalPredicting, setModalPredicting] = useState(false);
 
+
+
+
   // Fetch datasets (integrate with EDA/Data)
   useEffect(() => {
     const fetchDatasets = async () => {
@@ -181,17 +185,9 @@ const ModelLabPageImpl = () => {
     fetchDatasets();
   }, []);
 
-  useEffect(() => {
-    console.log('Datasets:', datasets);
-  }, [datasets]);
 
-  useEffect(() => {
-    console.log('Selected dataset:', selectedDataset);
-  }, [selectedDataset]);
 
-  useEffect(() => {
-    console.log('Experiments:', experiments);
-  }, [experiments]);
+
 
   // Fetch experiments (real API)
   const fetchExperiments = async () => {
@@ -200,6 +196,7 @@ const ModelLabPageImpl = () => {
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
       const res = await fetch(`${backendUrl}/api/model/experiments?user_id=demo&dataset_id=${selectedDataset.dataset_id}`);
       const data = await res.json();
+      console.log('Fetched experiments:', data.experiments);
       setExperiments(data.experiments || []);
     } catch {
       setExperiments([]);
@@ -210,6 +207,8 @@ const ModelLabPageImpl = () => {
     // eslint-disable-next-line
   }, [selectedDataset]);
 
+
+
   const handleCreateExperiment = async () => {
     if (!selectedDataset || !target || features.length === 0 || metrics.length === 0) {
       setError('Please fill all required fields.');
@@ -217,9 +216,6 @@ const ModelLabPageImpl = () => {
       return;
     }
     setCreating(true);
-    setIsTraining(true);
-    setTrainingProgress(0);
-    setTrainingStatus('Initializing experiment...');
     setError('');
     
     const payload = {
@@ -237,20 +233,6 @@ const ModelLabPageImpl = () => {
     };
     
     try {
-      // Simulate training progress
-      const progressInterval = setInterval(() => {
-        setTrainingProgress(prev => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return 90;
-          }
-          return prev + Math.random() * 15;
-        });
-      }, 1000);
-
-      setTrainingStatus('Creating experiment...');
-      setTrainingProgress(10);
-      
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
       const response = await fetch(`${backendUrl}/api/model/experiments`, {
         method: 'POST',
@@ -260,37 +242,26 @@ const ModelLabPageImpl = () => {
       
       if (!response.ok) throw new Error('Failed to create experiment');
       
-      setTrainingStatus('Model training in progress...');
-      setTrainingProgress(50);
-      
-      toast({ title: 'Experiment created!', description: 'Your model is now training.' });
+      toast({ title: 'Experiment created!', description: 'Click the Train button to start training your model.' });
       await fetchExperiments();
-      
-      // Complete the progress
-      setTrainingProgress(100);
-      setTrainingStatus('Training completed!');
-      
-      setTimeout(() => {
-        setIsTraining(false);
-        setTrainingProgress(0);
-        setTrainingStatus('');
-      }, 2000);
       
     } catch (e) {
       setError('Failed to create experiment.');
       toast({ title: 'Error', description: 'Failed to create experiment.', variant: 'destructive' });
-      setIsTraining(false);
-      setTrainingProgress(0);
-      setTrainingStatus('');
     } finally {
       setCreating(false);
     }
   };
 
+
+
   // Update algorithm when task changes
   useEffect(() => {
     setAlgorithm(ALGORITHMS[task][0].value);
   }, [task]);
+
+
+
 
   // Reset hyperparams, target, features, metrics when algorithm or dataset changes
   useEffect(() => {
@@ -792,35 +763,35 @@ Notes:
     try {
       // Start training
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
-      const res = await fetch(`${backendUrl}/api/model/train?experiment_id=${exp.experiment_id}`, { method: 'POST' });
+      const res = await fetch(`${backendUrl}/api/model/train`, { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ experiment_id: exp.experiment_id })
+      });
+      
       if (!res.ok) throw new Error('Failed to start training');
-      setTrainingStatus('Training in progress...');
-      toast({ title: 'Training started', description: `Experiment ${exp.experiment_id} is now running.` });
-      // Simulate progress bar
-      let progress = 0;
-      const progressInterval = setInterval(() => {
-        progress = Math.min(progress + Math.random() * 20, 90);
-        setTrainingProgress(progress);
-      }, 800);
-      // Poll backend for status
-      let status = 'queued';
-      while (status !== 'complete' && status !== 'failed') {
-        await new Promise(r => setTimeout(r, 2000));
-        const statusRes = await fetch(`${backendUrl}/api/model/status/${exp.experiment_id}`);
-        const statusData = await statusRes.json();
-        status = statusData.status;
-        setTrainingStatus(`Status: ${status}`);
-        if (status === 'running') setTrainingProgress(Math.max(progress, 30));
+      
+      const data = await res.json();
+      console.log('Training response:', data);
+      if (data.success) {
+        setTrainingStatus('Training completed!');
+        setTrainingProgress(100);
+        toast({ title: 'Training completed!', description: `Experiment ${exp.experiment_id} has been trained successfully.` });
+        
+        // Wait for backend to complete training, then refresh to get the updated status and metrics
+        setTimeout(async () => {
+          console.log('Refreshing experiments after training...');
+          await fetchExperiments();
+        }, 1500);
+        
+        setTimeout(() => {
+          setTrainingExpId(null);
+          setTrainingProgress(0);
+          setTrainingStatus('');
+        }, 2000);
+      } else {
+        throw new Error(data.error || 'Training failed');
       }
-      clearInterval(progressInterval);
-      setTrainingProgress(100);
-      setTrainingStatus(status === 'complete' ? 'Training complete!' : 'Training failed');
-      await fetchExperiments();
-      setTimeout(() => {
-        setTrainingExpId(null);
-        setTrainingProgress(0);
-        setTrainingStatus('');
-      }, 2000);
     } catch (err: any) {
       setTrainingStatus('Training failed');
       setTrainingExpId(null);
@@ -833,6 +804,9 @@ Notes:
   const latestCompletedExperiment = experiments
     .filter(exp => exp.status === 'complete' && exp.metrics)
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
+  
+  console.log('Experiments state:', experiments);
+  console.log('Latest completed experiment:', latestCompletedExperiment);
 
   const [copyClicked, setCopyClicked] = useState(false);
   const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
@@ -897,6 +871,8 @@ Notes:
           {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
         </div>
       </Card>
+
+
 
       {/* 1.5. Train-Test Split */}
       <Card title={<span id="train-test-split" className="text-2xl font-bold">Train-Test Split</span>}>
@@ -1022,17 +998,54 @@ Notes:
             </div>
           </div>
         )}
-        {/* Use activeTrainDataset if set, otherwise selectedDataset for all config/experiment logic */}
-        {(activeTrainDataset || selectedDataset) && task && algorithm && (
-          <div className="mb-6 p-5 rounded-xl bg-accent/80 border border-primary shadow-md flex flex-col gap-2">
-            <div className="font-semibold text-base mb-1 text-primary">Model Recommendation</div>
-            <ModelSummary
-              dataset={(activeTrainDataset || selectedDataset)!.dataset_id}
-              task={task}
-              algorithm={algorithm}
-            />
+        
+        {/* Model Description Section */}
+        <div className="mb-6 p-5 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 shadow-md">
+          <div className="flex items-center gap-2 mb-3">
+            <Info className="w-5 h-5 text-blue-600" />
+            <span className="font-semibold text-lg text-blue-900">Model Description</span>
           </div>
-        )}
+          <div className="text-blue-800 space-y-2">
+            <p className="text-sm">
+              <strong>Task:</strong> {task ? MODEL_TASKS.find(t => t.value === task)?.label : 'Not selected'} - 
+              {task === 'classification' && ' Predict categorical outcomes from input features'}
+              {task === 'regression' && ' Predict continuous numerical values from input features'}
+              {task === 'clustering' && ' Group similar data points into clusters based on feature similarity'}
+            </p>
+            {algorithm && (
+              <p className="text-sm">
+                <strong>Algorithm:</strong> {HYPERPARAMS[algorithm] ? 
+                  ALGORITHMS[task]?.find(a => a.value === algorithm)?.label : 
+                  'Not available'} - 
+                {algorithm === 'random_forest' && ' Ensemble method using multiple decision trees for robust predictions'}
+                {algorithm === 'xgboost' && ' Gradient boosting algorithm with optimized tree construction'}
+                {algorithm === 'logistic_regression' && ' Linear model for binary classification with probability outputs'}
+                {algorithm === 'random_forest_regressor' && ' Ensemble regression using multiple decision trees'}
+                {algorithm === 'xgboost_regressor' && ' Gradient boosting for regression tasks'}
+                {algorithm === 'linear_regression' && ' Simple linear model for continuous value prediction'}
+                {algorithm === 'kmeans' && ' Centroid-based clustering algorithm for grouping similar data points'}
+                {algorithm === 'dbscan' && ' Density-based clustering for finding clusters of varying shapes'}
+              </p>
+            )}
+            {target && (
+              <p className="text-sm">
+                <strong>Target:</strong> {target} - The variable you want to predict or cluster
+              </p>
+            )}
+            {features.length > 0 && (
+              <p className="text-sm">
+                <strong>Features:</strong> {features.length} selected features will be used as input variables
+              </p>
+            )}
+            {metrics.length > 0 && (
+              <p className="text-sm">
+                <strong>Evaluation Metrics:</strong> {metrics.map(m => METRICS[task]?.find(metric => metric.value === m)?.label).join(', ')} will be used to assess model performance
+              </p>
+            )}
+          </div>
+        </div>
+        
+        {/* Use activeTrainDataset if set, otherwise selectedDataset for all config/experiment logic */}
         <div className="flex flex-col gap-6">
           <div className="space-y-2">
             <label className="font-semibold text-base text-foreground">Task</label>
@@ -1187,7 +1200,7 @@ Notes:
               >
                 <div className="flex items-center justify-between">
                   <div className="font-semibold text-lg">{exp.config.algorithm}</div>
-                  <span className={`text-xs px-2 py-1 rounded ${exp.status === 'complete' ? 'bg-green-100 text-green-700' : exp.status === 'running' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-700'}`}>{exp.status}</span>
+                  <span className={`text-xs px-2 py-1 rounded ${exp.status === 'complete' ? 'bg-green-100 text-green-700' : exp.status === 'training' ? 'bg-yellow-100 text-yellow-700' : exp.status === 'queued' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}`}>{exp.status}</span>
                 </div>
                 <div className="text-xs text-muted-foreground">{exp.created_at}</div>
                 <div className="text-sm">Task: <span className="font-semibold">{exp.config.task}</span></div>
@@ -1505,48 +1518,6 @@ Notes:
   );
 };
 
-function ModelSummary({ dataset, task, algorithm }: { dataset: string, task: string, algorithm: string }) {
-  // Simple rules for summary (can be expanded)
-  let summary = '';
-  let benefits = '';
-  if (task === 'classification') {
-    if (algorithm === 'random_forest') {
-      summary = 'Random Forest is a robust ensemble method for classification tasks.';
-      benefits = 'It handles both numerical and categorical features, is resistant to overfitting, and works well with datasets with many features or missing values.';
-    } else if (algorithm === 'xgboost') {
-      summary = 'XGBoost is a powerful gradient boosting algorithm for classification.';
-      benefits = 'It is highly accurate, handles missing data, and is efficient for large datasets.';
-    } else if (algorithm === 'logistic_regression') {
-      summary = 'Logistic Regression is a simple, interpretable model for binary or multiclass classification.';
-      benefits = 'It is fast, easy to interpret, and works well when the relationship between features and target is linear.';
-    }
-  } else if (task === 'regression') {
-    if (algorithm === 'random_forest_regressor') {
-      summary = 'Random Forest Regressor is an ensemble method for regression tasks.';
-      benefits = 'It captures non-linear relationships, is robust to outliers, and works well with mixed feature types.';
-    } else if (algorithm === 'xgboost_regressor') {
-      summary = 'XGBoost Regressor is a high-performance gradient boosting model for regression.';
-      benefits = 'It is efficient, handles missing values, and often achieves state-of-the-art results.';
-    } else if (algorithm === 'linear_regression') {
-      summary = 'Linear Regression is a simple, interpretable model for regression.';
-      benefits = 'It is fast, easy to interpret, and works well when the relationship between features and target is linear.';
-    }
-  } else if (task === 'clustering') {
-    if (algorithm === 'kmeans') {
-      summary = 'K-Means is a popular clustering algorithm for partitioning data into groups.';
-      benefits = 'It is efficient, easy to implement, and works well when clusters are spherical and similar in size.';
-    } else if (algorithm === 'dbscan') {
-      summary = 'DBSCAN is a density-based clustering algorithm.';
-      benefits = 'It can find arbitrarily shaped clusters and is robust to outliers.';
-    }
-  }
-  return (
-    <div>
-      <div className="text-sm mb-1"><span className="font-medium">Recommended Model:</span> {algorithm.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</div>
-      <div className="text-sm mb-1"><span className="font-medium">Why this model?</span> {summary}</div>
-      <div className="text-xs text-muted-foreground"><span className="font-medium">Benefits:</span> {benefits}</div>
-    </div>
-  );
-}
+
 
 export default ModelLabPageImpl; 

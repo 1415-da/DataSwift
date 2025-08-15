@@ -7,7 +7,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     // Forward the request to the backend
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000';
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL || 'http://localhost:8000';
+    console.log('Backend URL being used:', backendUrl);
     const response = await fetch(`${backendUrl}/api/predict/deployed`, {
       method: 'GET',
       headers: {

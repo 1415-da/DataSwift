@@ -34,7 +34,7 @@ const plans: Array<{
     features: [
       "Unlimited datasets and storage",
       "Advanced EDA and ModelLab features",
-      "AI-powered model recommendations",
+      "Advanced model training and deployment",
       "Real-time collaboration and commenting",
       "Priority email support",
       "Access to interactive tutorials and feedback analytics",

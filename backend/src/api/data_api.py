@@ -28,6 +28,7 @@ async def upload_data(file: UploadFile = File(...)):
     try:
         file_bytes = await file.read()
         dataset_id = EDAService.upload_dataset(file_bytes, file.filename)
+        
         # Store metadata
         DATASET_METADATA[dataset_id] = {
             "dataset_id": dataset_id,
@@ -36,6 +37,7 @@ async def upload_data(file: UploadFile = File(...)):
             "upload_date": datetime.utcnow().isoformat(),
             "status": "ready"
         }
+        
         return {"dataset_id": dataset_id, "filename": file.filename}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

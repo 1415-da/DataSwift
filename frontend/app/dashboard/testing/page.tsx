@@ -88,6 +88,8 @@ export default function TestingPage() {
       setLoading(true);
       try {
         console.log('Fetching deployed models...');
+        console.log('Current backend URL from env:', process.env.NEXT_PUBLIC_BACKEND_URL);
+        
         const response = await fetch('/api/predict/deployed');
         console.log('Response status:', response.status);
         console.log('Response ok:', response.ok);
@@ -110,34 +112,21 @@ export default function TestingPage() {
         
         console.log('Deployed models data:', data);
         console.log('Models array:', data.models);
+        console.log('Number of models found:', data.models ? data.models.length : 0);
+        
+        if (data.models && data.models.length > 0) {
+          console.log('First model details:', data.models[0]);
+          console.log('All models:', data.models);
+        } else {
+          console.log('No models found in response, checking if this is expected...');
+        }
+        
         setDeployedModels(data.models || []);
       } catch (error) {
         console.error('Error fetching deployed models:', error);
-        console.log('Using fallback mock data...');
-        // Mock data for demonstration
-        setDeployedModels([
-          {
-            experiment_id: 'exp_001',
-            algorithm: 'Random Forest',
-            task: 'classification',
-            target: 'target_column',
-            features: ['feature1', 'feature2', 'feature3'],
-            endpoint_url: 'https://api.example.com/predict/exp_001',
-            accuracy: 0.95,
-            f1_score: 0.93,
-            deployed_at: '2024-01-15T10:30:00Z'
-          },
-          {
-            experiment_id: 'exp_002',
-            algorithm: 'XGBoost',
-            task: 'regression',
-            target: 'price',
-            features: ['area', 'bedrooms', 'bathrooms'],
-            endpoint_url: 'https://api.example.com/predict/exp_002',
-            accuracy: 0.88,
-            deployed_at: '2024-01-16T14:20:00Z'
-          }
-        ]);
+        console.log('Error details:', error);
+        console.log('No deployed models found - this is expected if no models have been deployed yet');
+        setDeployedModels([]);
       } finally {
         setLoading(false);
       }
@@ -343,7 +332,102 @@ export default function TestingPage() {
       {/* Model Selection */}
       <TestingCard title={<span id="model-selection" className="text-3xl font-extrabold">Model Selection</span>}>
         <div className="space-y-4">
-          <label className="font-semibold text-base">Select a deployed model:</label>
+                     <div className="flex items-center justify-between">
+             <label className="font-semibold text-base">Select a deployed model:</label>
+             <div className="flex gap-2">
+           </div>
+         </div>
+         
+         {/* Info message */}
+         <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+           <p className="text-sm text-blue-800">
+             <strong>Note:</strong> Models need to be deployed in Model Lab first before they appear here. 
+             Complete training and click "Deploy Model" in the Export & Deployment section.
+           </p>
+           <p className="text-sm text-blue-700 mt-2">
+             <strong>Current Status:</strong> {deployedModels.length === 0 ? 'No deployed models found' : `${deployedModels.length} deployed model(s) available`}
+           </p>
+         </div>
+         
+         <div className="flex items-center justify-between">
+           <label className="font-semibold text-base">Select a deployed model:</label>
+           <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setLoading(true);
+                  fetch('/api/predict/deployed')
+                    .then(res => res.json())
+                    .then(data => {
+                      console.log('Manual refresh - Deployed models:', data);
+                      setDeployedModels(data.models || []);
+                    })
+                    .catch(err => {
+                      console.error('Manual refresh error:', err);
+                      toast({ title: 'Error', description: 'Failed to refresh models', variant: 'destructive' });
+                    })
+                    .finally(() => setLoading(false));
+                }}
+                disabled={loading}
+                className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              >
+                {loading ? 'Refreshing...' : 'Refresh Models'}
+              </button>
+              <button
+                onClick={() => {
+                  setLoading(true);
+                  // Try direct backend call
+                  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+                  console.log('Direct backend call to:', backendUrl);
+                  fetch(`${backendUrl}/api/predict/deployed`)
+                    .then(res => res.json())
+                    .then(data => {
+                      console.log('Direct backend response:', data);
+                      setDeployedModels(data.models || []);
+                    })
+                    .catch(err => {
+                      console.error('Direct backend error:', err);
+                      toast({ title: 'Error', description: 'Direct backend call failed', variant: 'destructive' });
+                    })
+                    .finally(() => setLoading(false));
+                }}
+                disabled={loading}
+                className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 transition-colors"
+              >
+                {loading ? 'Testing...' : 'Test Backend'}
+              </button>
+              <button
+                onClick={() => {
+                  setLoading(true);
+                  // Check all experiments to see which ones are deployed
+                  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+                  console.log('Checking all experiments...');
+                  // Use the correct endpoint with user_id parameter
+                  fetch(`${backendUrl}/api/model/experiments?user_id=demo`)
+                    .then(res => res.json())
+                    .then(data => {
+                      console.log('All experiments:', data);
+                      // Filter for deployed ones
+                      const deployed = data.experiments?.filter((exp: any) => exp.deployed) || [];
+                      console.log('Deployed experiments found:', deployed);
+                      if (deployed.length > 0) {
+                        setDeployedModels(deployed);
+                      } else {
+                        toast({ title: 'Info', description: 'No deployed models found. Deploy models in Model Lab first.', variant: 'default' });
+                      }
+                    })
+                    .catch(err => {
+                      console.error('Error checking experiments:', err);
+                      toast({ title: 'Error', description: 'Failed to check experiments', variant: 'destructive' });
+                    })
+                    .finally(() => setLoading(false));
+                }}
+                disabled={loading}
+                className="px-3 py-1 text-sm bg-orange-600 text-white rounded hover:bg-orange-700 disabled:opacity-50 transition-colors"
+              >
+                {loading ? 'Checking...' : 'Check All Models'}
+              </button>
+            </div>
+          </div>
           <select
             className="w-full max-w-md border border-border rounded-lg px-4 py-3 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
             value={selectedModel?.experiment_id ?? ''}
