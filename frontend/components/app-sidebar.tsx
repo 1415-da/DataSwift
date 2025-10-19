@@ -74,7 +74,7 @@ const docsSubItems = [
 ];
 
 const dataSubItems = [
-  { title: "Data Upload", url: "/dashboard/data#overview" },
+  { title: "Data Upload", url: "/dashboard/data#upload" },
   { title: "Data Cleaning", url: "/dashboard/data#cleaning" },
   { title: "Data Preview", url: "/dashboard/data#preview" },
   { title: "Data Actions", url: "/dashboard/data#export" },
@@ -115,10 +115,10 @@ const historySubItems = [
 ];
 
 const transformationSubItems = [
-  { title: "Feature Engineering", url: "/dashboard/data#feature-engineering" },
-  { title: "Encoding", url: "/dashboard/data#encoding" },
-  { title: "Scaling", url: "/dashboard/data#scaling" },
-  { title: "Export", url: "/dashboard/data#export" },
+  { title: "Feature Engineering", url: "/dashboard/transformation#feature-engineering" },
+  { title: "Encoding", url: "/dashboard/transformation#encoding" },
+  { title: "Scaling", url: "/dashboard/transformation#scaling" },
+  { title: "Export", url: "/dashboard/transformation#export" },
 ];
 
 const mainNav = [

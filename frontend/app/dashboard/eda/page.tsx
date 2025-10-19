@@ -151,6 +151,8 @@ const EDAOverviewPage = () => {
   useEffect(() => {
     import('chartjs-plugin-zoom').then((mod) => {
       ChartJS.register(mod.default);
+    }).catch((error) => {
+      console.warn('Failed to load chartjs-plugin-zoom:', error);
     });
   }, []);
 
