@@ -62,7 +62,7 @@ export default function DataUploadCard({ onUpload }: DataUploadCardProps) {
   // Handle file input and upload to backend
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !file.name) return;
     const ext = file.name.split('.').pop()?.toLowerCase();
     const reader = new FileReader();
     reader.onload = async (event) => {
