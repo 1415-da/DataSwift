@@ -2,17 +2,14 @@
 fastapi==0.109.0
 uvicorn==0.27.1
 
-# Data & ML
-pandas==2.1.4
-numpy==1.25.2
-scikit-learn==1.4.2
-xgboost==2.0.3
-matplotlib==3.8.2
+# Data & ML (updated for Python 3.13 compatibility)
+pandas==2.2.3
+numpy==2.1.2
+scikit-learn==1.5.2
+xgboost==2.1.1
+matplotlib==3.9.2
 
-# Database
-sqlalchemy==2.0.29
-databases==0.9.0  # Use the latest compatible version
-asyncpg==0.29.0  # If using PostgreSQL
+# Database (using MongoDB only; removed Postgres deps for Python 3.13)
 pymongo==4.6.3
 
 # Environment
@@ -37,5 +34,4 @@ httpx==0.27.0
 sentry-sdk==2.2.0 
 
 pydantic<2.0.0
-pydantic-settings==0.2.5
-PyYAML==5.4.1
+# Removed pydantic-settings and PyYAML to avoid Python 3.13 conflicts
