@@ -26,7 +26,7 @@ DataSwift is a **monorepo** with separate frontend and backend:
 ### Prerequisites
 
 - Node.js 18+
-- Python 3.11+
+- Python 3.11+ (Python 3.13 compatible)
 - pnpm (recommended) or npm
 
 ### Installation
@@ -39,13 +39,58 @@ cd dataswift
 # Install dependencies
 pnpm install
 pnpm install:backend
-
-# Start development servers
-pnpm run dev          # Frontend (Next.js)
-pnpm dev:backend  # Backend (FastAPI)
 ```
 
+### Starting the Project
+
+#### Option 1: Manual Start (Recommended for Development)
+
+```bash
+# Terminal 1: Start Backend
+cd backend
+source .venv/bin/activate
+MONGO_URL="mongodb://localhost:27017" DATABASE_NAME="dataswift" python -m uvicorn app:app --reload --host 0.0.0.0 --port 8000
+
+# Terminal 2: Start Frontend
+cd frontend
+pnpm dev
+```
+
+#### Option 2: Using Docker Compose (Full Stack)
+
+```bash
+# Start all services (MongoDB + Backend + Frontend)
+docker compose up
+```
+
+#### Option 3: Using Root Scripts
+
+```bash
+# Start frontend only
+pnpm dev
+
+# Start backend only
+pnpm dev:backend
+```
+
+### Access the Application
+
+- **Frontend**: http://localhost:3000 (or 3001 if 3000 is busy)
+- **Backend API**: http://localhost:8000
+- **API Health Check**: http://localhost:8000/health
+
 ### Environment Setup
+
+#### Backend Environment Variables
+
+The backend uses these environment variables (set them when starting):
+
+```bash
+MONGO_URL="mongodb://localhost:27017"  # MongoDB connection (optional - falls back to in-memory)
+DATABASE_NAME="dataswift"              # Database name
+```
+
+#### Frontend Environment Variables
 
 Create a `.env.local` file in the `frontend` directory:
 
@@ -54,16 +99,32 @@ Create a `.env.local` file in the `frontend` directory:
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your-secret-key-here
 
-# OAuth Providers
+# OAuth Providers (optional)
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 
-# Database
+# Database (optional - uses in-memory storage by default)
 DATABASE_URL=your-mongodb-url
 
-# AI Features
+# AI Features (optional)
 OPENAI_API_KEY=your-openai-api-key
 ```
+
+### Troubleshooting
+
+#### Common Issues
+
+1. **Port 8000 already in use**: Kill existing processes with `lsof -ti:8000 | xargs kill -9`
+2. **Port 3000 already in use**: Next.js will automatically use port 3001
+3. **MongoDB connection failed**: Backend falls back to in-memory storage (works fine for development)
+4. **Python dependencies issues**: Ensure you're using Python 3.11+ and have activated the virtual environment
+
+#### Development Notes
+
+- **Backend**: Runs on port 8000 with auto-reload enabled
+- **Frontend**: Runs on port 3000 (or 3001) with hot reloading
+- **Database**: MongoDB is optional - backend works with in-memory storage
+- **API Proxy**: Frontend proxies `/api/*` requests to backend automatically
 
 ## 📁 Project Structure
 
@@ -87,10 +148,12 @@ DataSwift/
 ## 🔌 API Endpoints
 
 ### Data Management
-- `POST /api/data/upload` - Upload datasets
-- `GET /api/data/list` - List all datasets
-- `GET /api/data/analyze` - Analyze dataset
-- `POST /api/data/process` - Process data
+- `POST /api/data/upload` - Upload datasets (CSV, Excel, JSON)
+- `GET /api/data/list` - List all datasets with metadata
+- `GET /api/data/analyze?dataset_id=...` - Analyze dataset (EDA)
+- `POST /api/data/clean?dataset_id=...&method=auto` - Clean dataset
+- `GET /api/data/export?dataset_id=...` - Export dataset (CSV/Excel/JSON)
+- `DELETE /api/data/delete?dataset_id=...` - Delete dataset
 
 ### Machine Learning
 - `POST /api/model/train` - Train models
@@ -100,6 +163,9 @@ DataSwift/
 ### User Management
 - `GET /api/user/profile` - Get user profile
 - `PUT /api/user/profile` - Update user profile
+
+### System
+- `GET /health` - Health check endpoint
 
 ## 🎯 Key Features
 
