@@ -1,7 +1,7 @@
 "use client"
 
 import type * as React from "react"
-import { ChevronDown, Database, TestTube, GraduationCap, BookOpen, Sun, Moon, Laptop, BarChart2, FlaskConical, CheckCircle2, Users, Layers, Settings as SettingsIcon, Clock } from "lucide-react"
+import { ChevronDown, Database, TestTube, GraduationCap, BookOpen, Sun, Moon, Laptop, BarChart2, FlaskConical, CheckCircle2, Users, Layers, Settings as SettingsIcon } from "lucide-react"
 import { useTheme } from "next-themes"
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -107,12 +107,7 @@ const testingSubItems = [
   { title: "Performance Metrics", url: "/dashboard/testing#confusion-matrix" },
 ];
 
-const historySubItems = [
-  { title: "Activity Overview", url: "/dashboard/history#overview" },
-  { title: "Search & Filters", url: "/dashboard/history#filters" },
-  { title: "Activity List", url: "/dashboard/history#activity-list" },
-  { title: "Export Data", url: "/dashboard/history#export" },
-];
+// Activity History removed
 
 const transformationSubItems = [
   { title: "Feature Engineering", url: "/dashboard/transformation#feature-engineering" },
@@ -129,7 +124,6 @@ const mainNav = [
   { title: "Model Testing", url: "/dashboard/testing", icon: CheckCircle2, subItems: testingSubItems },
   { title: "Team Collaboration", url: "/dashboard/collaboration", icon: Users },
   { title: "Documentation", icon: BookOpen, subItems: docsSubItems },
-  { title: "Activity History", url: "/dashboard/history", icon: Clock, subItems: historySubItems },
   // KnowledgeHub and Settings removed from this group
 ];
 
@@ -141,7 +135,6 @@ const mainNavHref = {
   "Model Laboratory": '/dashboard/modellab',
   "Model Testing": '/dashboard/testing',
   "Team Collaboration": '/dashboard/collaboration',
-  "Activity History": '/dashboard/history',
   "Data Transformation": '/dashboard/transformation',
 };
 
@@ -171,12 +164,7 @@ const testingSectionIds = [
   'confusion-matrix',
 ];
 
-const historySectionIds = [
-  'overview',
-  'filters',
-  'activity-list',
-  'export',
-];
+// Activity History section IDs removed
 
 const transformationSectionIds = [
   'feature-engineering',
@@ -196,13 +184,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [dataOpen, setDataOpen] = useState(pathname.startsWith('/dashboard/data'));
   const [docsOpen, setDocsOpen] = useState(pathname.startsWith('/dashboard/knowledgehub'));
   const [testingOpen, setTestingOpen] = useState(pathname.startsWith('/dashboard/testing'));
-  const [historyOpen, setHistoryOpen] = useState(pathname.startsWith('/dashboard/history'));
+  // Activity History open state removed
   const [docsActiveHash, setDocsActiveHash] = useState('');
   // Add EDA section IDs for scroll tracking
   const [activeEdaSection, setActiveEdaSection] = useState('overview');
   const [activeModelLabSection, setActiveModelLabSection] = useState('select-dataset');
   const [activeTestingSection, setActiveTestingSection] = useState('model-selection');
-  const [activeHistorySection, setActiveHistorySection] = useState('overview');
+  // Activity History active section state removed
   const [activeTransformationSection, setActiveTransformationSection] = useState('feature-engineering');
   const [transformationOpen, setTransformationOpen] = useState(pathname.startsWith('/dashboard/transformation'));
 
@@ -317,30 +305,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [pathname]);
 
-  // Scroll tracking for History
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (!pathname.startsWith('/dashboard/history')) return;
-    const handleScroll = () => {
-      let current = historySectionIds[0];
-      for (const id of historySectionIds) {
-        const el = document.getElementById(id);
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= 80) {
-            current = id;
-          }
-        }
-      }
-      if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 2)) {
-        current = historySectionIds[historySectionIds.length - 1];
-      }
-      setActiveHistorySection(current);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [pathname]);
+  // Activity History scroll tracking removed
 
   // Scroll tracking for Data Transformation
   useEffect(() => {
@@ -377,7 +342,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   useEffect(() => { setDataOpen(pathname.startsWith('/dashboard/data')); }, [pathname]);
   useEffect(() => { setDocsOpen(pathname.startsWith('/dashboard/knowledgehub')); }, [pathname]);
   useEffect(() => { setTestingOpen(pathname.startsWith('/dashboard/testing')); }, [pathname]);
-  useEffect(() => { setHistoryOpen(pathname.startsWith('/dashboard/history')); }, [pathname]);
   useEffect(() => { setTransformationOpen(pathname.startsWith('/dashboard/transformation')); }, [pathname]);
 
   return (
@@ -405,7 +369,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       item.title === 'Exploratory Analysis' ? edaOpen :
                       item.title === 'Model Laboratory' ? modellabOpen :
                       item.title === 'Model Testing' ? testingOpen :
-                      item.title === 'Activity History' ? historyOpen :
                       item.title === 'Data Transformation' ? transformationOpen :
                       undefined
                     }
@@ -415,7 +378,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       item.title === 'Exploratory Analysis' ? setEdaOpen :
                       item.title === 'Model Laboratory' ? setModellabOpen :
                       item.title === 'Model Testing' ? setTestingOpen :
-                      item.title === 'Activity History' ? setHistoryOpen :
                       item.title === 'Data Transformation' ? setTransformationOpen :
                       undefined
                     }
@@ -425,7 +387,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       item.title === 'Exploratory Analysis' ? pathname.startsWith('/dashboard/eda') :
                       item.title === 'Model Laboratory' ? pathname.startsWith('/dashboard/modellab') :
                       item.title === 'Model Testing' ? pathname.startsWith('/dashboard/testing') :
-                      item.title === 'Activity History' ? pathname.startsWith('/dashboard/history') :
                       item.title === 'Data Transformation' ? pathname.startsWith('/dashboard/transformation') : false}
                     className="group/collapsible mt-2"
                   >
@@ -442,7 +403,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             else if (item.title === 'Model Laboratory') setManualActiveSection('modellab');
                             else if (item.title === 'Model Testing') setManualActiveSection('testing');
                             else if (item.title === 'Team Collaboration') setManualActiveSection('collaboration');
-                            else if (item.title === 'Activity History') setManualActiveSection('history');
                             else if (item.title === 'Data Transformation') setManualActiveSection('feature-engineering');
                           }}
                         >
@@ -455,7 +415,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                               (item.title === 'Model Testing' && pathname.startsWith('/dashboard/testing')) ? 'bg-primary/10 text-primary' :
                               (item.title === 'Team Collaboration' && pathname.startsWith('/dashboard/collaboration')) ? 'bg-primary/10 text-primary' :
                               (item.title === 'Documentation' && pathname.startsWith('/dashboard/knowledgehub')) ? 'bg-primary/10 text-primary' :
-                              (item.title === 'Activity History' && pathname.startsWith('/dashboard/history')) ? 'bg-primary/10 text-primary' :
                               (item.title === 'Data Transformation' && pathname.startsWith('/dashboard/transformation')) ? 'bg-primary/10 text-primary' :
                               ''
                             ].join(' ')}
@@ -474,7 +433,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                (item.title === 'Model Testing' && pathname.startsWith('/dashboard/testing')) ||
                                (item.title === 'Team Collaboration' && pathname.startsWith('/dashboard/collaboration')) ||
                                (item.title === 'Documentation' && pathname.startsWith('/dashboard/knowledgehub')) ||
-                               (item.title === 'Activity History' && pathname.startsWith('/dashboard/history')) ||
                                (item.title === 'Data Transformation' && pathname.startsWith('/dashboard/transformation'))
                               ) && (
                                 <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1.5 rounded-full bg-primary shadow-lg transition-all duration-300" />
@@ -505,8 +463,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 isActive = pathname === '/dashboard/modellab' && ((hoveredSection && hoveredSection === hash) || (!hoveredSection && (manualActiveSection ? manualActiveSection === hash : activeModelLabSection === hash)));
                                                              } else if (item.title === 'Model Testing') {
                                  isActive = pathname === '/dashboard/testing' && ((hoveredSection && hoveredSection === hash) || (!hoveredSection && (manualActiveSection ? manualActiveSection === hash : activeTestingSection === hash)));
-                               } else if (item.title === 'Activity History') {
-                                 isActive = pathname === '/dashboard/history' && ((hoveredSection && hoveredSection === hash) || (!hoveredSection && (manualActiveSection ? manualActiveSection === hash : activeHistorySection === hash)));
                                } else if (item.title === 'Data Transformation') {
                                  isActive = pathname === '/dashboard/transformation' && ((hoveredSection && hoveredSection === hash) || (!hoveredSection && (manualActiveSection ? manualActiveSection === hash : activeTransformationSection === hash)));
                                }
@@ -516,7 +472,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     <a
                                       href={subItem.url}
                                       className={[
-                                        'pl-7 py-1 block text-[0.97rem] font-normal flex items-center gap-2 transition-colors rounded relative',
+                                        'pl-7 py-1 text-[0.97rem] font-normal flex items-center gap-2 transition-colors rounded relative',
                                         isActive ? 'text-primary font-semibold' : 'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                                       ].join(' ')}
                                       onMouseEnter={() => setHoveredSection(hash)}

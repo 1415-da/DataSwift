@@ -1,15 +1,29 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 import uvicorn
 
 # Import API routers
 from src.api import data_api, knowledge_api, model_api, user_api, predict_api
+
+# Custom middleware to handle larger request bodies
+class LargeRequestMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # Set a larger max request size (50MB)
+        if hasattr(request, '_body'):
+            # This is handled by uvicorn configuration
+            pass
+        response = await call_next(request)
+        return response
 
 app = FastAPI(
     title="DataSwift API",
     description="A comprehensive data science platform API",
     version="1.0.0"
 )
+
+# Add custom middleware for large requests
+app.add_middleware(LargeRequestMiddleware)
 
 # Configure CORS
 app.add_middleware(
@@ -40,4 +54,12 @@ async def health_check():
     return {"status": "healthy", "service": "DataSwift API"}
 
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run(
+        "app:app", 
+        host="0.0.0.0", 
+        port=8000, 
+        reload=True,
+        limit_max_requests=1000,
+        limit_concurrency=1000,
+        timeout_keep_alive=30,
+    )

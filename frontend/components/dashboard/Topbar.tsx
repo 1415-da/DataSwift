@@ -96,7 +96,7 @@ function ProfileModal({ open, onOpenChange, user }: { open: boolean, onOpenChang
 }
 
 export default function Topbar() {
-  const { user, logout, setUser } = useAuth() as any;
+  const { user, logout, setUser, loading } = useAuth() as any;
   const router = useRouter();
   const [profileOpen, setProfileOpen] = useState(false);
 
@@ -111,12 +111,16 @@ export default function Topbar() {
             <button className="flex items-center gap-2 focus:outline-none" onClick={() => setProfileOpen(true)}>
               <Avatar>
                 {user?.avatarUrl ? (
-                  <AvatarImage src={user.avatarUrl} alt={user.name || user.email} />
+                  <AvatarImage src={user.avatarUrl} alt={user?.name || user?.email || 'User'} />
                 ) : (
-                  <AvatarFallback>{user?.name ? user.name[0].toUpperCase() : user?.email?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+                  <AvatarFallback>
+                    {loading ? '' : (user?.name ? user.name[0].toUpperCase() : user?.email?.[0]?.toUpperCase() || '?')}
+                  </AvatarFallback>
                 )}
               </Avatar>
-              <span className="hidden md:inline text-sm font-medium text-foreground/80">{user?.name || user?.email}</span>
+              <span className="hidden md:inline text-sm font-medium text-foreground/80">
+                {loading ? ' ' : (user?.name || user?.email || '')}
+              </span>
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">

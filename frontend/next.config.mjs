@@ -9,6 +9,19 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // Increase body size limit for file uploads
+  experimental: {
+    serverComponentsExternalPackages: [],
+    // Increase middleware body size limit
+    middlewareClientMaxBodySize: '50mb',
+  },
+  // Configure API routes with larger body size
+  api: {
+    bodyParser: {
+      sizeLimit: '50mb',
+    },
+    responseLimit: '50mb',
+  },
   async rewrites() {
     return [
       {

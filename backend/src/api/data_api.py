@@ -26,7 +26,11 @@ async def get_data_endpoints():
 async def upload_data(file: UploadFile = File(...)):
     """Upload data file (CSV) and return dataset_id"""
     try:
+        # Check file size (limit to 50MB)
         file_bytes = await file.read()
+        if len(file_bytes) > 50 * 1024 * 1024:  # 50MB limit
+            raise HTTPException(status_code=413, detail="File size exceeds 50MB limit")
+        
         dataset_id = EDAService.upload_dataset(file_bytes, file.filename)
         
         # Store metadata
@@ -39,6 +43,8 @@ async def upload_data(file: UploadFile = File(...)):
         }
         
         return {"dataset_id": dataset_id, "filename": file.filename}
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 

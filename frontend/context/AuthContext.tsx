@@ -28,15 +28,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  // Hydrate from localStorage on first mount to retain user across refresh while session loads
   useEffect(() => {
-    if (session?.user) {
-      setUser({
+    try {
+      const stored = typeof window !== 'undefined' ? localStorage.getItem('auth:user') : null;
+      if (stored && !user) {
+        const parsed = JSON.parse(stored) as User;
+        setUser(parsed);
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    // Reflect next-auth session into our local state and storage
+    if (status === "authenticated" && session?.user) {
+      const nextUser: User = {
         name: session.user.name || "",
         email: session.user.email || "",
         avatarUrl: session.user.image || "",
-      });
-    } else {
+      };
+      setUser(nextUser);
+      try {
+        localStorage.setItem('auth:user', JSON.stringify(nextUser));
+      } catch {}
+    } else if (status === "unauthenticated") {
       setUser(null);
+      try {
+        localStorage.removeItem('auth:user');
+      } catch {}
     }
     setLoading(status === "loading");
   }, [session, status]);
@@ -55,6 +75,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     signOut({ callbackUrl: "/" });
     setUser(null);
+    try {
+      localStorage.removeItem('auth:user');
+    } catch {}
   };
 
   const signInWithProvider = (provider: string) => {

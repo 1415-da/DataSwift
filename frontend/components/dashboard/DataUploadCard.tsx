@@ -246,7 +246,12 @@ export default function DataUploadCard({ onUpload }: DataUploadCardProps) {
       </CardHeader>
       <CardContent>
         <div className="flex gap-2 mb-4 flex-wrap">
-          <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>Upload File</Button>
+          <Button
+            onClick={() => fileInputRef.current?.click()}
+            className="font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-md ring-2 ring-indigo-500 ring-offset-1 transform transition-transform duration-200 ease-out hover:scale-105 hover:shadow-lg hover:ring-indigo-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600"
+          >
+            Upload File
+          </Button>
           <Button variant="secondary" onClick={() => setShowApiModal(true)}>Connect API</Button>
           <Button variant="secondary" onClick={() => setShowDbModal(true)}>Link Database</Button>
           <Input type="file" accept=".csv,.xlsx,.xls,.json" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
