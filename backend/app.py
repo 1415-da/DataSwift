@@ -10,6 +10,8 @@ from src.api import data_api, knowledge_api, model_api, user_api, predict_api
 class LargeRequestMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # Set a larger max request size (50MB)
+        # Note: Actual max request size is typically enforced by the ASGI server (uvicorn/gunicorn)
+        # Keep this middleware as a placeholder for any request preprocessing if needed.
         if hasattr(request, '_body'):
             # This is handled by uvicorn configuration
             pass
@@ -28,36 +30,30 @@ app.add_middleware(LargeRequestMiddleware)
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://your-frontend.vercel.app",
-        "https://dataswift-frontend.onrender.com",
-        "http://localhost:3000"
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Include API routers
-app.include_router(data_api.router, prefix="/api/data", tags=["data"])
-app.include_router(knowledge_api.router, prefix="/api/knowledge", tags=["knowledge"])
-app.include_router(model_api.router, prefix="/api/model", tags=["model"])
-app.include_router(predict_api.router, prefix="/api/predict", tags=["predict"])
-app.include_router(user_api.router, prefix="/api/user", tags=["user"])
+# Register API routers
+app.include_router(data_api.router, prefix="/data", tags=["data"])
+app.include_router(knowledge_api.router, prefix="/knowledge", tags=["knowledge"])
+app.include_router(model_api.router, prefix="/model", tags=["model"])
+app.include_router(user_api.router, prefix="/users", tags=["users"])
+app.include_router(predict_api.router, prefix="/predict", tags=["predict"])
 
-@app.get("/")
-async def root():
-    return {"message": "Welcome to DataSwift API", "version": "1.0.0"}
 
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "service": "DataSwift API"}
 
+
 if __name__ == "__main__":
     uvicorn.run(
-        "app:app", 
-        host="0.0.0.0", 
-        port=8000, 
+        "app:app",
+        host="0.0.0.0",
+        port=8000,
         reload=True,
         limit_max_requests=1000,
         limit_concurrency=1000,
