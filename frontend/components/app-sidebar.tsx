@@ -4,6 +4,7 @@ import type * as React from "react"
 import { ChevronDown, Database, TestTube, GraduationCap, BookOpen, Sun, Moon, Laptop, BarChart2, FlaskConical, CheckCircle2, Users, Layers, Settings as SettingsIcon } from "lucide-react"
 import { useTheme } from "next-themes"
 import Image from 'next/image';
+import { DataSwiftLogo } from '@/components/DataSwiftLogo';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -349,7 +350,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <div className="flex items-center space-x-2 px-2 py-2">
           <div className="w-8 h-8 flex items-center justify-center overflow-hidden rounded-lg bg-background border border-border">
-            <Image src="/logo.svg" alt="DataSwift Logo" width={32} height={32} className="object-cover w-8 h-8" />
+            <DataSwiftLogo width={32} height={32} className="object-cover w-8 h-8" />
           </div>
           <span className="text-xl font-semibold">DataSwift</span>
         </div>

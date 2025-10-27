@@ -6,6 +6,7 @@ import { ArrowRight, Database, BarChart3, Brain, Users, Zap, Shield, Sun, Moon }
 import { ChevronDown, ChevronUp } from "lucide-react"
 import { useTheme } from "next-themes"
 import Image from "next/image"
+import { DataSwiftLogo } from '@/components/DataSwiftLogo'
 import { useEffect, useState, useRef } from "react"
 import { useSession, signOut } from "next-auth/react"
 import { LoginModal, SignUpModal } from "@/components/AuthModals"
@@ -90,14 +91,7 @@ function SplashScreen() {
         exit={{ opacity: 0, y: -40, transition: { duration: 0.7 } }}
         className="flex items-center space-x-4"
       >
-        <Image
-          src="/logo.svg"
-          alt="DataSwift Logo"
-          width={80}
-          height={80}
-          className="object-cover w-20 h-20 rounded-lg"
-          priority
-        />
+        <DataSwiftLogo width={80} height={80} className="object-cover w-20 h-20 rounded-lg" />
         <span className="text-5xl font-extrabold text-primary">DataSwift</span>
       </motion.div>
     </motion.div>
@@ -329,14 +323,7 @@ export default function LandingPagePreview() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <div className="w-10 h-10 flex items-center justify-center overflow-hidden">
-                <Image
-                  src="/logo.svg"
-                  alt="DataSwift Logo"
-                  width={60}
-                  height={60}
-                  className="object-cover w-12 h-12 rounded-lg"
-                  priority
-                />
+                <DataSwiftLogo width={60} height={60} className="object-cover w-12 h-12 rounded-lg" />
               </div>
               <span className="text-xl font-bold">DataSwift</span>
             </div>
@@ -793,14 +780,7 @@ export default function LandingPagePreview() {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <div className="w-12 h-12 flex items-center justify-center overflow-hidden">
-                  <Image
-                    src="/logo.svg"
-                    alt="DataSwift Logo"
-                    width={60}
-                    height={60}
-                    className="object-cover w-12 h-12 rounded-lg"
-                    priority
-                  />
+                  <DataSwiftLogo width={60} height={60} className="object-cover w-12 h-12 rounded-lg" />
                 </div>
                 <span className="text-xl font-bold">DataSwift</span>
               </div>
