@@ -91,7 +91,7 @@ function SplashScreen() {
         className="flex items-center space-x-4"
       >
         <Image
-          src="/LOGO.jpg"
+          src="/logo.svg"
           alt="DataSwift Logo"
           width={80}
           height={80}
@@ -330,7 +330,7 @@ export default function LandingPagePreview() {
             <div className="flex items-center space-x-2">
               <div className="w-10 h-10 flex items-center justify-center overflow-hidden">
                 <Image
-                  src="/LOGO.jpg"
+                  src="/logo.svg"
                   alt="DataSwift Logo"
                   width={60}
                   height={60}
@@ -794,7 +794,7 @@ export default function LandingPagePreview() {
               <div className="flex items-center space-x-2 mb-4">
                 <div className="w-12 h-12 flex items-center justify-center overflow-hidden">
                   <Image
-                    src="/LOGO.jpg"
+                    src="/logo.svg"
                     alt="DataSwift Logo"
                     width={60}
                     height={60}

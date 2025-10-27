@@ -349,7 +349,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <div className="flex items-center space-x-2 px-2 py-2">
           <div className="w-8 h-8 flex items-center justify-center overflow-hidden rounded-lg bg-background border border-border">
-            <Image src="/LOGO.jpg" alt="DataSwift Logo" width={32} height={32} className="object-cover w-8 h-8" />
+            <Image src="/logo.svg" alt="DataSwift Logo" width={32} height={32} className="object-cover w-8 h-8" />
           </div>
           <span className="text-xl font-semibold">DataSwift</span>
         </div>
